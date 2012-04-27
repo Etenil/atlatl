@@ -58,7 +58,8 @@
                     if (class_exists($class)) {
                         $obj = new $class;
                         if (method_exists($obj, $method)) {
-                            $obj->$method($matches);
+							call_user_func_array(array($obj, $method),
+												 array_slice($matches, 1));
                         } else {
                             throw new BadMethodCallException("Method, $method, not supported.");
                         }
