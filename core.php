@@ -1,5 +1,7 @@
 <?php
 
+namespace glue;
+
     /**
      * glue
      *
@@ -28,7 +30,7 @@
      * glue::stick($urls);
      *
      */
-    class glue {
+    class Core {
 
         /**
          * stick
