@@ -1,7 +1,7 @@
 Glue
 ====
 
-Author: Joe Topjian, joe@topjian.net
+Author: Joe Topjian <joe@topjian.net>
 
 Glue is a simple PHP class that maps URLs to classes. The concepts are similar to web.py for Python.
 
@@ -13,13 +13,12 @@ Glue is licensed under a BSD license. See LICENSE file for further details.
 
 Pull Requests
 =============
-Since creating and publishing GluePHP, I have received a lot of patches and pull requests. Each
-modification is vastly different than the other.
+Unlike the original author's branch, this branch is open to pull requests and patch proposals.
 
-GluePHP is a __very__ simple PHP script and there are an almost infinite amount of modifications
-and alternative styles that can be applied to it. Because of this, I do not accept patches or
-pull requests. All patches that I have received have had very good ideas, so I do not think it
-would be fair to accept some patches and not others (since most are incompatible with each other).
+Branch Goals
+============
+The overall goal of this branch is to make a viable core for a bigger framework, thus constituting some sort of *nano framework*, smaller and more agile than the recently popular *micro frameworks*.
 
-GluePHP is BSD licensed. By all means, fork the code, hack it up as much as you want, and 
-republish it. :)
+Testability will also be stressed with the introduction of Dependency-Injection and PHPUnit support.
+
+Finally, security features will be introduced as PHP only provides very basic safety guards and this should be part of the core of any non-trivial project.
