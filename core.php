@@ -2,6 +2,8 @@
 
 namespace glue;
 
+require('security.php');
+
     /**
      * glue
      *
@@ -31,30 +33,66 @@ namespace glue;
      *
      */
     class Core {
+		// URL prefix.
+		protected $prefix = "";
 
+		/**
+		 * Class constructor.
+		 * @param string $prefix is the URL prefix to use for this application.
+		 */
+		public function __construct($prefix = "")
+		{
+			$this->setPrefix($prefix);
+		}
+		
+		/**
+		 * Changes the URL prefix to work from.
+		 * @param string $prefix is the URL prefix to use, for instance "/glue".
+		 * @return this object (you can make a call chain).
+		 */
+		public function setPrefix($prefix)
+		{
+			// We ensure that the prefix is properly formatted. It
+			// must start with a '/' and end without one.
+			if($prefix != "") {
+				if($prefix[0] != '/') {
+					$prefix = '/' . $prefix;
+				}
+				if($prefix[strlen($prefix)] == '/') {
+					$prefix = substr($prefix, 0, strlen($prefix) - 1);
+				}
+			}
+			
+			$this->prefix = $prefix;
+			return $this;
+		}
+		
         /**
          * stick
          *
-         * the main static function of the glue class.
+         * the main method of the glue class.
          *
          * @param   array    	$urls  	    The regex-based url to class mapping
-		 * @param   string      $prefix     The URL prefix to apply to path matching
          * @throws  Exception               Thrown if corresponding class is not found
          * @throws  Exception               Thrown if no match is found
          * @throws  BadMethodCallException  Thrown if a corresponding GET,POST is not found
          *
          */
-        static function stick ($urls, $prefix = "") {
+        function serve(array $urls) {
 
             $method = strtoupper($_SERVER['REQUEST_METHOD']);
             $path = $_SERVER['REQUEST_URI'];
+			
+			if($path == $this->prefix) {
+				$path.= '/'; // This is necessary to match '/' with a prefix.
+			}
 
             $found = false;
 
             krsort($urls);
 
             foreach ($urls as $regex => $class) {
-                $regex = str_replace('/', '\/', $prefix . $regex);
+                $regex = str_replace('/', '\/', $this->prefix . $regex);
                 $regex = '^' . $regex . '\/?$';
                 if (preg_match("/$regex/i", $path, $matches)) {
                     $found = true;
@@ -64,16 +102,16 @@ namespace glue;
 							call_user_func_array(array($obj, $method),
 												 array_slice($matches, 1));
                         } else {
-                            throw new BadMethodCallException("Method, $method, not supported.");
+                            throw new \BadMethodCallException("Method, $method, not supported.");
                         }
                     } else {
-                        throw new Exception("Class, $class, not found.");
+                        throw new \Exception("Class, $class, not found.");
                     }
                     break;
                 }
             }
             if (!$found) {
-                throw new Exception("URL, $path, not found.");
+                throw new \Exception("URL, $path, not found.");
             }
         }
     }
