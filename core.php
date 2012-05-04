@@ -51,7 +51,7 @@ class Core {
             if($prefix[0] != '/') {
                 $prefix = '/' . $prefix;
             }
-            if($prefix[strlen($prefix)] == '/') {
+            if($prefix[strlen($prefix) - 1] == '/') {
                 $prefix = substr($prefix, 0, strlen($prefix) - 1);
             }
         }
@@ -66,45 +66,65 @@ class Core {
      * The main method of the Core class.
      *
      * @param   array    	$urls  	    The regex-based url to class mapping
+     * @param   string      $url        Optional url to route from. Default is $_SERVER['REQUEST_URI']
      * @throws  Exception               Thrown if corresponding class is not found
      * @throws  Exception               Thrown if no match is found
      * @throws  BadMethodCallException  Thrown if a corresponding GET,POST is not found
      *
      */
-    function serve(array $urls) {
-
-        $method = strtoupper($_SERVER['REQUEST_METHOD']);
+    function serve(array $urls, $url = null) {
+        $http_method = strtoupper($_SERVER['REQUEST_METHOD']);
         $path = $_SERVER['REQUEST_URI'];
 
         if($path == $this->prefix) {
             $path.= '/'; // This is necessary to match '/' with a prefix.
         }
 
-        $found = false;
-
         krsort($urls);
 
-        foreach ($urls as $regex => $class) {
-            $regex = str_replace('/', '\/', $this->prefix . $regex);
-            $regex = '^' . $regex . '\/?$';
-            if (preg_match("/$regex/i", $path, $matches)) {
-                $found = true;
-                if (class_exists($class)) {
-                    $obj = new $class;
-                    if (method_exists($obj, $method)) {
-                        call_user_func_array(array($obj, $method),
-                                             array_slice($matches, 1));
-                    } else {
-                        throw new \BadMethodCallException("Method, $method, not supported.");
-                    }
-                } else {
-                    throw new \Exception("Class, $class, not found.");
-                }
-                break;
+        $call = false;        // This will store the controller and method to call
+        $matches = array();   // And this the extracted parameters.
+
+        // First we search for specific method routes.
+        $method_urls = preg_grep("%^$http_method%", $urls);
+        foreach($method_urls as $regex => $proto) {
+            if(preg_match('%^'. $this->prefix . $regex .'/?$%i',
+                          $http_method . $path, $matches)) {
+                $call = $proto;
             }
         }
-        if (!$found) {
+
+        echo "<p>call: $call</p>";
+
+        // Do we need to try generic routes?
+        if(!$call) {
+            foreach($urls as $regex => $proto) {
+                if(preg_match('%^'. $this->prefix . $regex .'/?$%i',
+                              $path, $matches)) {
+                    $call = $proto;
+                }
+            }
+        }
+
+
+        echo "<p>call: $call</p>";
+
+        // If we don't have a call at this point, that's a 404.
+        if(!$call) {
             throw new \Exception("URL, $path, not found.");
+        }
+
+        list($class, $method) = explode('::', $call);
+        if(class_exists($class)) {
+            $obj = new $class();
+            if(method_exists($obj, $method)) {
+                /*call_user_func_array(array($obj, $method),
+                  array_slice($matches, 1));*/
+            } else {
+                throw new \BadMethodCallException("Method, $method, not supported.");
+            }
+        } else {
+            throw new \Exception("Class, $class, not found.");
         }
     }
 }
