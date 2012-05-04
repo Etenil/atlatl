@@ -94,8 +94,6 @@ class Core {
             }
         }
 
-        echo "<p>call: $call</p>";
-
         // Do we need to try generic routes?
         if(!$call) {
             foreach($urls as $regex => $proto) {
@@ -107,19 +105,18 @@ class Core {
         }
 
 
-        echo "<p>call: $call</p>";
-
         // If we don't have a call at this point, that's a 404.
         if(!$call) {
             throw new \Exception("URL, $path, not found.");
         }
 
         list($class, $method) = explode('::', $call);
+
         if(class_exists($class)) {
             $obj = new $class();
             if(method_exists($obj, $method)) {
-                /*call_user_func_array(array($obj, $method),
-                  array_slice($matches, 1));*/
+                call_user_func_array(array($obj, $method),
+									 array_slice($matches, 1));
             } else {
                 throw new \BadMethodCallException("Method, $method, not supported.");
             }
