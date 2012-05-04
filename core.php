@@ -3,7 +3,7 @@
 
 namespace Movicon;
 
-require('security.php');
+require('controller.php');
 
 /**
  * Core routing functionality.
