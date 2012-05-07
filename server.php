@@ -44,10 +44,11 @@ class Server
 	protected $protocol;
 	protected $uri;
 	protected $time;
+	protected $route;
 	
-	public function __construct()
+	public function __construct(array $server)
 	{
-		$this->parsevars($_SERVER);
+		$this->parsevars($server);
 	}
 	
 	/**
@@ -76,6 +77,17 @@ class Server
 		$this->protocol = $this->clean($s['SERVER_PROTOCOL']);
 		$this->uri = $this->clean($s['REQUEST_URI']);
 		$this->time = $this->clean($s['REQUEST_TIME']);
+
+		// Stripping GET and anchor from the URI.
+		$this->route = $this->uri;
+		$get_id = strpos($this->route, '?');
+		if($get_id !== false) {
+			$this->route = substr($this->route, 0, $get_id);
+		}
+		$anchor_id = strpos($this->route, '#');
+		if($anchor_id !== false) {
+			$this->route = substr($this->route, 0, $anchor_id);
+		}
 	}
 	
 	/**
@@ -135,6 +147,8 @@ class Server
 		{ return $this->uri; }
 	public function getTime()
 		{ return $this->time; }
+	public function getRoute()
+	    { return $this->route; }
 }
 
 ?>

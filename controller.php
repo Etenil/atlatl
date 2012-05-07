@@ -2,7 +2,7 @@
 
 namespace Movicon;
 
-require('security.php');
+require_once('security.php');
 
 /**
  * Basic implementation of a Controller.
@@ -28,11 +28,13 @@ require('security.php');
 class Controller
 {
 	protected $server;
+	protected $request;
 	protected $sec;
 
-	public function __construct(Server $server)
+	public function __construct(Server $server, Request $request)
 	{
 		$this->server = $server;
+		$this->request = $request;
 		$this->sec = new Security();
 	}
 }

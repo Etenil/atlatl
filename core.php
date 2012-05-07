@@ -3,8 +3,9 @@
 
 namespace Movicon;
 
-require('server.php');
-require('controller.php');
+require_once('server.php');
+require_once('request.php');
+require_once('controller.php');
 
 /**
  * Core routing functionality.
@@ -74,8 +75,9 @@ class Core {
      *
      */
     function serve(array $urls, $url = null) {
-		$server = new Server();
-        $path = $server->getUri();
+		$server = new Server($_SERVER);
+		$request = new Request($_GET, $_POST);
+        $path = $server->getRoute();
 
         if($path == $this->prefix) {
             $path.= '/'; // This is necessary to match '/' with a prefix.
@@ -117,7 +119,7 @@ class Core {
         list($class, $method) = explode('::', $call);
 
         if(class_exists($class)) {
-            $obj = new $class($server);
+            $obj = new $class($server, $request);
             if(method_exists($obj, $method)) {
                 call_user_func_array(array($obj, $method),
 									 array_slice($matches, 1));
