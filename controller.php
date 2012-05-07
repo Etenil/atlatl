@@ -27,10 +27,12 @@ require('security.php');
  */
 class Controller
 {
+	protected $server;
 	protected $sec;
 
-	public function __construct()
+	public function __construct(Server $server)
 	{
+		$this->server = $server;
 		$this->sec = new Security();
 	}
 }

@@ -3,6 +3,7 @@
 
 namespace Movicon;
 
+require('server.php');
 require('controller.php');
 
 /**
@@ -73,24 +74,26 @@ class Core {
      *
      */
     function serve(array $urls, $url = null) {
-        $http_method = strtoupper($_SERVER['REQUEST_METHOD']);
-        $path = $_SERVER['REQUEST_URI'];
+		$server = new Server();
+        $path = $server->getUri();
 
         if($path == $this->prefix) {
             $path.= '/'; // This is necessary to match '/' with a prefix.
         }
 
+		// We revert-sort the keys to match more specific routes first.
         krsort($urls);
 
         $call = false;        // This will store the controller and method to call
         $matches = array();   // And this the extracted parameters.
 
         // First we search for specific method routes.
-        $method_urls = preg_grep("%^$http_method%", $urls);
+        $method_urls = preg_grep("%^$server->getMethod()%", $urls);
         foreach($method_urls as $regex => $proto) {
             if(preg_match('%^'. $this->prefix . $regex .'/?$%i',
-                          $http_method . $path, $matches)) {
+                          $server->getMethod() . $path, $matches)) {
                 $call = $proto;
+				break;
             }
         }
 
@@ -100,6 +103,7 @@ class Core {
                 if(preg_match('%^'. $this->prefix . $regex .'/?$%i',
                               $path, $matches)) {
                     $call = $proto;
+					break;
                 }
             }
         }
@@ -113,7 +117,7 @@ class Core {
         list($class, $method) = explode('::', $call);
 
         if(class_exists($class)) {
-            $obj = new $class();
+            $obj = new $class($server);
             if(method_exists($obj, $method)) {
                 call_user_func_array(array($obj, $method),
 									 array_slice($matches, 1));
