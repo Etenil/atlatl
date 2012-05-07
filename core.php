@@ -30,14 +30,28 @@ require_once('controller.php');
 class Core {
     // URL prefix.
     protected $prefix = "";
+	protected $server;
+	protected $request;
 
     /**
      * Class constructor.
      * @param string $prefix is the URL prefix to use for this application.
      */
-    public function __construct($prefix = "")
+    public function __construct($prefix = "", Server $server = null, Request $request = null)
     {
         $this->setPrefix($prefix);
+
+		if($server) {
+			$this->server = $server;
+		} else {
+			$this->server = new Server($_SERVER);
+		}
+		
+		if($request) {
+			$this->resquet = $request;
+		} else {
+			$this->request = new Request($_GET, $_POST);
+		}
     }
 
     /**
@@ -68,16 +82,13 @@ class Core {
      * The main method of the Core class.
      *
      * @param   array    	$urls  	    The regex-based url to class mapping
-     * @param   string      $url        Optional url to route from. Default is $_SERVER['REQUEST_URI']
      * @throws  Exception               Thrown if corresponding class is not found
      * @throws  Exception               Thrown if no match is found
      * @throws  BadMethodCallException  Thrown if a corresponding GET,POST is not found
      *
      */
-    function serve(array $urls, $url = null) {
-		$server = new Server($_SERVER);
-		$request = new Request($_GET, $_POST);
-        $path = $server->getRoute();
+    function serve(array $urls) {
+        $path = $this->server->getRoute();
 
         if($path == $this->prefix) {
             $path.= '/'; // This is necessary to match '/' with a prefix.
@@ -90,10 +101,10 @@ class Core {
         $matches = array();   // And this the extracted parameters.
 
         // First we search for specific method routes.
-        $method_urls = preg_grep("%^$server->getMethod()%", $urls);
+        $method_urls = preg_grep('%^' . $this->server->getMethod() . '%', $urls);
         foreach($method_urls as $regex => $proto) {
             if(preg_match('%^'. $this->prefix . $regex .'/?$%i',
-                          $server->getMethod() . $path, $matches)) {
+                          $this->server->getMethod() . $path, $matches)) {
                 $call = $proto;
 				break;
             }
@@ -119,7 +130,7 @@ class Core {
         list($class, $method) = explode('::', $call);
 
         if(class_exists($class)) {
-            $obj = new $class($server, $request);
+            $obj = new $class($this->server, $this->request);
             if(method_exists($obj, $method)) {
                 call_user_func_array(array($obj, $method),
 									 array_slice($matches, 1));
