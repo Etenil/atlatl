@@ -45,38 +45,38 @@ class Server
 	protected $uri;
 	protected $time;
 	protected $route;
-	
+
 	public function __construct(array $server)
 	{
 		$this->parsevars($server);
 	}
-	
+
 	/**
 	 * Parses server variables into this class.
 	 */
 	protected function parsevars(array $s)
 	{
-		$this->method = $this->clean($s['REQUEST_METHOD']);
-		$this->host = $this->clean($s['HTTP_HOST']);
-		$this->user_agent = $this->clean($s['HTTP_USER_AGENT']);
-		$this->accept = explode(',', $this->clean($s['HTTP_ACCEPT']));
-		$this->languages = explode(',', $this->clean($s['HTTP_ACCEPT_LANGUAGE']));
-		$this->encodings = explode(',', $this->clean($s['HTTP_ACCEPT_ENCODING']));
-		$this->connection = $this->clean($s['HTTP_CONNECTION']);
-		$this->referer = $this->clean($s['HTTP_REFERER']);
-		$this->path = $this->clean($s['PATH']);
-		$this->software = $this->clean($s['SERVER_SOFTWARE']);
-		$this->name = $this->clean($s['SERVER_NAME']);
-		$this->address = $this->clean($s['SERVER_ADDR']);
-		$this->port = $this->clean($s['SERVER_PORT']);
-		$this->remote_addr = $this->clean($s['REMOTE_ADDR']);
-		$this->remote_port = $this->clean($s['REMOTE_PORT']);
-		$this->admin = $this->clean($s['SERVER_ADMIN']);
-		$this->filename = $this->clean($s['SCRIPT_FILENAME']);
-		$this->scriptname = $this->clean($s['SCRIPT_NAME']);
-		$this->protocol = $this->clean($s['SERVER_PROTOCOL']);
-		$this->uri = $this->clean($s['REQUEST_URI']);
-		$this->time = $this->clean($s['REQUEST_TIME']);
+		$this->method      = $this->arrayGet('REQUEST_METHOD', $s);
+		$this->host        = $this->arrayGet('HTTP_HOST', $s);
+		$this->user_agent  = $this->arrayGet('HTTP_USER_AGENT', $s);
+		$this->accept      = explode(',', $this->arrayGet('HTTP_ACCEPT', $s));
+		$this->languages   = explode(',', $this->arrayGet('HTTP_ACCEPT_LANGUAGE', $s));
+		$this->encodings   = explode(',', $this->arrayGet('HTTP_ACCEPT_ENCODING', $s));
+		$this->connection  = $this->arrayGet('HTTP_CONNECTION', $s);
+		$this->referer     = $this->arrayGet('HTTP_REFERER', $s);
+		$this->path        = $this->arrayGet('PATH', $s);
+		$this->software    = $this->arrayGet('SERVER_SOFTWARE', $s);
+		$this->name        = $this->arrayGet('SERVER_NAME', $s);
+		$this->address     = $this->arrayGet('SERVER_ADDR', $s);
+		$this->port        = $this->arrayGet('SERVER_PORT', $s);
+		$this->remote_addr = $this->arrayGet('REMOTE_ADDR', $s);
+		$this->remote_port = $this->arrayGet('REMOTE_PORT', $s);
+		$this->admin       = $this->arrayGet('SERVER_ADMIN', $s);
+		$this->filename    = $this->arrayGet('SCRIPT_FILENAME', $s);
+		$this->scriptname  = $this->arrayGet('SCRIPT_NAME', $s);
+		$this->protocol    = $this->arrayGet('SERVER_PROTOCOL', $s);
+		$this->uri         = $this->arrayGet('REQUEST_URI', $s);
+		$this->time        = $this->arrayGet('REQUEST_TIME', $s);
 
 		// Stripping GET and anchor from the URI.
 		$this->route = $this->uri;
@@ -89,7 +89,20 @@ class Server
 			$this->route = substr($this->route, 0, $anchor_id);
 		}
 	}
-	
+
+    /**
+     * Gets, checks and cleans an array entry. Avoids warnings and
+     * simplifies use.
+     */
+    protected function arrayGet($key, array $array)
+    {
+        if(isset($array[$key])) {
+            return $this->clean($array[$key]);
+        } else {
+            return false;
+        }
+    }
+
 	/**
 	 * Cleans up server entries.
 	 */
@@ -103,7 +116,7 @@ class Server
 			return $serverstring;
 		}
 	}
-	
+
 // Accessors
 	public function getMethod()
 		{ return $this->method; }
@@ -112,7 +125,7 @@ class Server
 	public function getUserAgent()
 		{ return $this->user_agent; }
 	public function getAccept()
-		{ return $this->accept; }	
+		{ return $this->accept; }
 	public function getLanguages()
 		{ return $this->languages; }
 	public function getEncodings()
