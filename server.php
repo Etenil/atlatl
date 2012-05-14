@@ -56,7 +56,7 @@ class Server
 	 */
 	protected function parsevars(array $s)
 	{
-		$this->method      = $this->arrayGet('REQUEST_METHOD', $s);
+		$this->method      = strtoupper($this->arrayGet('REQUEST_METHOD', $s));
 		$this->host        = $this->arrayGet('HTTP_HOST', $s);
 		$this->user_agent  = $this->arrayGet('HTTP_USER_AGENT', $s);
 		$this->accept      = $this->arrayGet('HTTP_ACCEPT', $s, true);
