@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Movicon;
+namespace atlatl;
 
 require_once('server.php');
 require_once('request.php');
@@ -11,22 +11,22 @@ require_once('controller.php');
 /**
  * Core routing functionality.
  *
- * HTTP requests are routed from this class and the Movicon core jump
+ * HTTP requests are routed from this class and the Atlatl core jump
  * started from here.
  *
- * This file is part of Movicon.
+ * This file is part of Atlatl.
  *
- * Movicon is free software: you can redistribute it and/or modify
+ * Atlatl is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * Movicon is distributed in the hope that it will be useful,
+ * Atlatl is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Movicon.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Atlatl.  If not, see <http://www.gnu.org/licenses/>.
  */
 class Core {
     // URL prefix.
@@ -78,7 +78,7 @@ class Core {
     }
 
 	/**
-	 * Serves the requests. Call this on the top-level application only.
+	 * Serves the requests.
 	 */
 	function serve(array $urls)
 	{
@@ -151,7 +151,7 @@ class Core {
 				}
 				else if(gettype($response) != 'object'
 						|| (gettype($response) == 'object'
-							&& get_class($response) != 'Movicon\Response')) {
+							&& get_class($response) != 'atlatl\Response')) {
 					throw new \Exception('Unknown response.');
 				}
 				return $response;
