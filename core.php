@@ -110,10 +110,10 @@ class Core {
         $matches = array();   // And this the extracted parameters.
 
         // First we search for specific method routes.
-        $method_urls = preg_grep('%^' . $this->server->getMethod() . '%', $urls);
+        $method_urls = preg_grep('%^' . $this->server->getMethod() . ':%', $urls);
         foreach($method_urls as $regex => $proto) {
             if(preg_match('%^'. $this->prefix . $regex .'/?$%i',
-                          $this->server->getMethod() . $path, $matches)) {
+                          $this->server->getMethod() . ':' . $path, $matches)) {
                 $call = $proto;
 				break;
             }
