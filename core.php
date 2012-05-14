@@ -5,6 +5,7 @@ namespace Movicon;
 
 require_once('server.php');
 require_once('request.php');
+require_once('response.php');
 require_once('controller.php');
 
 /**
@@ -76,6 +77,14 @@ class Core {
         return $this;
     }
 
+	/**
+	 * Serves the requests. Call this on the top-level application only.
+	 */
+	function serve(array $urls)
+	{
+		$this->route($urls)->compile();
+	}
+	
     /**
      * Does the actual URL routing.
      *
@@ -87,7 +96,7 @@ class Core {
      * @throws  BadMethodCallException  Thrown if a corresponding GET,POST is not found
      *
      */
-    function serve(array $urls) {
+    function route(array $urls) {
         $path = $this->server->getRoute();
 
         if($path == $this->prefix) {
@@ -132,8 +141,20 @@ class Core {
         if(class_exists($class)) {
             $obj = new $class($this->server, $this->request);
             if(method_exists($obj, $method)) {
-                call_user_func_array(array($obj, $method),
-									 array_slice($matches, 1));
+                $response = call_user_func_array(array($obj, $method),
+												 array_slice($matches, 1));
+				if(gettype($response) == 'string') {
+					$response = new Response($response);
+				}
+				else if($response === null) {
+					$response = new Response();
+				}
+				else if(gettype($response) != 'object'
+						|| (gettype($response) == 'object'
+							&& get_class($response) != 'Movicon\Response')) {
+					throw new \Exception('Unknown response.');
+				}
+				return $response;
             } else {
                 throw new \BadMethodCallException("Method, $method, not supported.");
             }

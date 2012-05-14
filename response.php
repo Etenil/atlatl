@@ -2,14 +2,8 @@
 
 namespace Movicon;
 
-require_once('security.php');
-
 /**
- * Basic implementation of a Controller.
- *
- * Controllers are used to process incoming events. This is the basic
- * implementation that all controllers should extend. Some helper functions
- * are provided.
+ * Abstraction of an HTTP response.
  *
  * This file is part of Movicon.
  *
@@ -25,27 +19,50 @@ require_once('security.php');
  * You should have received a copy of the GNU General Public License
  * along with Movicon.  If not, see <http://www.gnu.org/licenses/>.
  */
-class Controller
+class Response
 {
-	protected $server;
-	protected $request;
-	protected $sec;
+	protected $headers;
+	protected $body;
 
-	public function __construct(Server $server, Request $request)
+	public function __construct($body = '')
 	{
-		$this->server = $server;
-		$this->request = $request;
-		$this->sec = new Security();
+		$this->headers = array();
+		$this->body = $body;
+	}
+	
+	/**
+	 * Sets the contents of the HTTP response's body.
+	 */
+	public function setBody($data)
+	{
+		$this->body = $data;
 	}
 
-	protected function dump($var, $no_html = false)
+	/**
+	 * Appends a string to body.
+	 */
+	public function append($section)
 	{
-		$dump = var_export($var, true);
-		if($no_html) {
-			return $dump;
-		} else {
-			return '<pre>' . htmlentities($dump) . '</pre>' . PHP_EOL;;
+		$this->body .= $section;
+	}
+
+	/**
+	 * Sets a header value.
+	 */
+	public function setHeader($name, $value)
+	{
+		$this->headers[$name] = $value;
+	}
+
+	/**
+	 * Generates the page.
+	 */
+	public function compile()
+	{
+		foreach($this->headers as $hdrkey => $hdrval) {
+			header($hdrkey, $hdrval);
 		}
+		echo $this->body;
 	}
 }
 
