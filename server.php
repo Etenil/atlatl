@@ -59,9 +59,9 @@ class Server
 		$this->method      = $this->arrayGet('REQUEST_METHOD', $s);
 		$this->host        = $this->arrayGet('HTTP_HOST', $s);
 		$this->user_agent  = $this->arrayGet('HTTP_USER_AGENT', $s);
-		$this->accept      = explode(',', $this->arrayGet('HTTP_ACCEPT', $s));
-		$this->languages   = explode(',', $this->arrayGet('HTTP_ACCEPT_LANGUAGE', $s));
-		$this->encodings   = explode(',', $this->arrayGet('HTTP_ACCEPT_ENCODING', $s));
+		$this->accept      = $this->arrayGet('HTTP_ACCEPT', $s, true);
+		$this->languages   = $this->arrayGet('HTTP_ACCEPT_LANGUAGE', $s, true);
+		$this->encodings   = $this->arrayGet('HTTP_ACCEPT_ENCODING', $s, true);
 		$this->connection  = $this->arrayGet('HTTP_CONNECTION', $s);
 		$this->referer     = $this->arrayGet('HTTP_REFERER', $s);
 		$this->path        = $this->arrayGet('PATH', $s);
@@ -94,10 +94,16 @@ class Server
      * Gets, checks and cleans an array entry. Avoids warnings and
      * simplifies use.
      */
-    protected function arrayGet($key, array $array)
+    protected function arrayGet($key, array $array, $split = false)
     {
         if(isset($array[$key])) {
-            return $this->clean($array[$key]);
+			if($split) {
+				$data = explode(',', $this->clean($array[$key]));
+				$data = array_map(function($item) { return trim($item); }, $data);
+				return $data;
+			} else {
+				return $this->clean($array[$key]);
+			}
         } else {
             return false;
         }
