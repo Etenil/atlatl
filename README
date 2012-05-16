@@ -1,6 +1,5 @@
 Atlatl
 ====
-
 Author: Guillaume Pasquet (aka Etenil) <boss@etenil.net>
 
 Atlatl is a fast and modular MVC framework for PHP
@@ -16,6 +15,37 @@ The overall goal of this branch is to make a viable core for a bigger framework,
 Testability needs to be stressed with the introduction of Dependency-Injection and PHPUnit support.
 
 Finally, security features will be introduced as PHP only provides very basic safety guards and this should be part of the core of any non-trivial project.
+
+Usage
+=====
+
+Here is an example of how to use atlatl:
+
+	require('core.php');
+
+	$app = new atlatl\Core('/atlatl/test.php');
+
+    class TestModule extends atlatl\Module
+	{
+		protected $name;
+		
+		function hello()
+		{
+			return "Hello ".$this->name."!";
+		}
+	}
+
+	class TestController extends atlatl\Controller
+	{
+		function test()
+		{
+			echo $this->modules->TestModule->hello();
+		}
+	}
+
+	$app->loadModule('TestModule', array('name' => 'Guillaume'));
+	$app->serve(array('/' => 'TestController::test'));
+
 
 Credits
 =======
