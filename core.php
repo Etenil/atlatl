@@ -7,6 +7,8 @@ require_once('server.php');
 require_once('request.php');
 require_once('response.php');
 require_once('controller.php');
+require_once('modulecontainer.php');
+require_once('module.php');
 
 /**
  * Core routing functionality.
@@ -33,6 +35,7 @@ class Core {
     protected $prefix = "";
 	protected $server;
 	protected $request;
+	protected $modules;
 
     /**
      * Class constructor.
@@ -53,7 +56,14 @@ class Core {
 		} else {
 			$this->request = new Request($_GET, $_POST);
 		}
+
+		$this->modules = new ModuleContainer();
     }
+
+	public function loadModule($module, $options = NULL)
+	{
+		$this->modules->addModule($module, $options);
+	}
 
     /**
      * Changes the URL prefix to work from.
@@ -139,7 +149,7 @@ class Core {
         list($class, $method) = explode('::', $call);
 
         if(class_exists($class)) {
-            $obj = new $class($this->server, $this->request);
+            $obj = new $class($this->modules, $this->server, $this->request);
             if(method_exists($obj, $method)) {
                 $response = call_user_func_array(array($obj, $method),
 												 array_slice($matches, 1));

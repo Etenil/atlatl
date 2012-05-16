@@ -27,12 +27,14 @@ require_once('security.php');
  */
 class Controller
 {
+	protected $modules;
 	protected $server;
 	protected $request;
 	protected $sec;
 
-	public function __construct(Server $server, Request $request)
+	public function __construct(ModuleContainer $modules, Server $server, Request $request)
 	{
+		$this->modules = $modules;
 		$this->server = $server;
 		$this->request = $request;
 		$this->sec = new Security();
