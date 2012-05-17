@@ -65,6 +65,11 @@ class Core {
 		$this->modules->addModule($module, $options);
 	}
 
+	public function setModules(ModuleContainer $container)
+	{
+		$this->modules = $container;
+	}
+
     /**
      * Changes the URL prefix to work from.
      * @param string $prefix is the URL prefix to use, for instance "/glue".
