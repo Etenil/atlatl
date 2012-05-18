@@ -40,7 +40,7 @@ class Controller
 		$this->sec = new Security();
 
         // Running the user init.
-        $this->init();
+        $this->_init();
 	}
 
     protected function _init()
