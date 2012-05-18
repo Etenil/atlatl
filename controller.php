@@ -38,7 +38,14 @@ class Controller
 		$this->server = $server;
 		$this->request = $request;
 		$this->sec = new Security();
+
+        // Running the user init.
+        $this->init();
 	}
+
+    protected function _init()
+    {
+    }
 
 	protected function dump($var, $no_html = false)
 	{
