@@ -50,7 +50,7 @@ class Core {
 		} else {
 			$this->server = new Server($_SERVER);
 		}
-		
+
 		if($request) {
 			$this->resquet = $request;
 		} else {
@@ -99,7 +99,7 @@ class Core {
 	{
 		$this->route($urls)->compile();
 	}
-	
+
     /**
      * Does the actual URL routing.
      *
@@ -125,11 +125,13 @@ class Core {
         $matches = array();   // And this the extracted parameters.
 
         // First we search for specific method routes.
-        $method_urls = preg_grep('%^' . $this->server->getMethod() . ':%', $urls);
-        foreach($method_urls as $regex => $proto) {
-            if(preg_match('%^'. $this->prefix . $regex .'/?$%i',
-                          $this->server->getMethod() . ':' . $path, $matches)) {
-                $call = $proto;
+        $method_routes = preg_grep('/^' . $this->server->getMethod() . ':/i', array_keys($urls));
+        foreach($method_routes as $route) {
+            $method = $this->server->getMethod() . ':';
+            $clean_route = substr($route, strlen($method));
+            if(preg_match('%^'. $this->prefix . $clean_route .'/?$%i',
+                          $path, $matches)) {
+                $call = $urls[$route];
 				break;
             }
         }
