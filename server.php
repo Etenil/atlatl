@@ -123,6 +123,11 @@ class Server
 		}
 	}
 
+    public function getWholePost()
+    {
+        return file_get_contents('php://input');
+    }
+
 // Accessors
 	public function getMethod()
 		{ return $this->method; }
