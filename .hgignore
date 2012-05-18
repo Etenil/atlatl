@@ -3,3 +3,5 @@ syntax: glob
 #*#
 test.php
 .DS_Store*
+*.orig
+
