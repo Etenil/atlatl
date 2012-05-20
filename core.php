@@ -157,6 +157,9 @@ class Core {
 
         if(class_exists($class)) {
             $obj = new $class($this->modules, $this->server, $this->request);
+			
+			$obj->preRequest();
+			
             if(method_exists($obj, $method)) {
                 $response = call_user_func_array(array($obj, $method),
 												 array_slice($matches, 1));
@@ -171,6 +174,9 @@ class Core {
 							&& get_class($response) != 'atlatl\Response')) {
 					throw new \Exception('Unknown response.');
 				}
+
+				$obj->postRequest($response);
+				
 				return $response;
             } else {
                 throw new \BadMethodCallException("Method, $method, not supported.");

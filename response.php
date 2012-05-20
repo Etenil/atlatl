@@ -41,6 +41,12 @@ class Response
 	public function setBody($data)
 	{
 		$this->body = $data;
+		return $this;
+	}
+
+	public function getBody()
+	{
+		return $this->body;
 	}
 
 	/**
@@ -49,6 +55,7 @@ class Response
 	public function append($section)
 	{
 		$this->body .= $section;
+		return $this;
 	}
 
 	/**
@@ -57,6 +64,21 @@ class Response
 	public function setHeader($name, $value)
 	{
 		$this->headers[$name] = $value;
+		return $this;
+	}
+
+	public function getHeader($name)
+	{
+		if(isset($this->headers[$name])) {
+			return $this->headers[$name];
+		} else {
+			return false;
+		}
+	}
+
+	public function getHeaders()
+	{
+		return $this->headers;
 	}
 
 	protected function httpStatus()

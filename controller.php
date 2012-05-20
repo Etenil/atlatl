@@ -56,6 +56,22 @@ class Controller
 			return '<pre>' . htmlentities($dump) . '</pre>' . PHP_EOL;;
 		}
 	}
+
+	/**
+	 * Method executed prior to any request handling.
+	 */
+	public function preRequest()
+	{
+	}
+
+	/**
+	 * Method executed following any request handling. This method is
+	 * expected to return a Response object, which will then be sent
+	 * back to the user.
+	 */
+	public function postRequest(Response $response)
+	{
+	}
 }
 
 ?>
