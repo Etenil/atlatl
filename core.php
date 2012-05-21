@@ -54,7 +54,7 @@ class Core {
 		if($request) {
 			$this->resquet = $request;
 		} else {
-			$this->request = new Request($_GET, $_POST, $_SESSION, $_COOKIE);
+			$this->request = new Request($_GET, $_POST, $_COOKIE);
 		}
 
 		$this->modules = new ModuleContainer();

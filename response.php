@@ -32,7 +32,7 @@ class Response
 
 	public function __construct($body = '', $status_code = 200,
 								$content_type = 'text/html; charset=UTF-8',
-                                array $session = null, array $cookies = null,
+                                array $cookies = null, array $session = null,
                                 $start_session = false)
 	{
 		$this->status_code = $status_code;
@@ -43,7 +43,8 @@ class Response
         $this->start_session = false;
         if($session) {
             $this->sessionvars = $session;
-        } else {
+        }
+        else if($start_session) {
             $this->sessionvars = $_SESSION;
         }
 
