@@ -26,15 +26,38 @@ class Response
 	protected $body;
 	protected $content_type;
 
+    protected $sessionvars;
+    protected $cookievars;
+    protected $start_session;
+
 	public function __construct($body = '', $status_code = 200,
-								$content_type = 'text/html; charset=UTF-8')
+								$content_type = 'text/html; charset=UTF-8',
+                                array $session = null, array $cookies = null,
+                                $start_session = false)
 	{
 		$this->status_code = $status_code;
 		$this->content_type = $content_type;
 		$this->headers = array();
 		$this->body = $body;
+
+        $this->start_session = false;
+        if($session) {
+            $this->sessionvars = $session;
+        } else {
+            $this->sessionvars = $_SESSION;
+        }
+
+        if($cookies) {
+            $this->cookievars = $cookies;
+        } else {
+            $this->cookievars = $_COOKIE;
+        }
+
+        if($start_session) {
+            $this->startSession();
+        }
 	}
-	
+
 	/**
 	 * Sets the contents of the HTTP response's body.
 	 */
@@ -80,6 +103,67 @@ class Response
 	{
 		return $this->headers;
 	}
+
+    /**
+     * Initiates a session.
+     */
+    public function startSession()
+    {
+        $this->start_session = true;
+    }
+
+    /**
+     * Sets a SESSION variable.
+     * @param varname is the variable's name.
+     * @param varval is the value to assign to the variable.
+     */
+    public function setSession($varname, $varval)
+    {
+        $this->sessionvars[$varname] = $varval;
+    }
+
+    /**
+     * Retrieves the value of a session variable.
+     * @param $varname is the variable's name
+     * @param $default is the default value to be returned.
+     */
+    public function getSession($varname, $default = false)
+    {
+        if(isset($this->sessionvars[$varname])) {
+            return $this->sessionvars[$varname];
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Sets a SESSION variable.
+     * @param varname is the variable's name.
+     * @param varval is the value to assign to the variable.
+     */
+    public function setCookie($varname, $varval)
+    {
+        $this->sessionvars[$varname] = $varval;
+    }
+
+    /**
+     * Retrieves the value of a session variable.
+     * @param $varname is the variable's name
+     * @param $default is the default value to be returned.
+     */
+    public function getCookie($varname, $default = false)
+    {
+        if(isset($this->sessionvars[$varname])) {
+            return $this->sessionvars[$varname];
+        } else {
+            return false;
+        }
+    }
+
+    public function hasSession()
+    {
+        return $this->start_session;
+    }
 
 	protected function httpStatus()
 	{
@@ -128,17 +212,26 @@ class Response
 			);
 		return $statuses[$this->status_code];
 	}
-	
+
 	/**
 	 * Generates the page.
 	 */
 	public function compile()
 	{
+        // Starting session first.
+        if($this->start_session) {
+            session_start();
+            $_SESSION = array_merge($_SESSION, $this->sessionvars);
+        }
+
 		header('HTTP/1.1 ' . $this->httpStatus());
 		header('Content-Type: ' . $this->content_type);
 		foreach($this->headers as $hdrkey => $hdrval) {
 			header($hdrkey, $hdrval);
 		}
+
+        $_COOKIE = array_merge($_COOKIE, $this->cookievars);
+
 		echo $this->body;
 	}
 }
