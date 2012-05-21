@@ -68,9 +68,12 @@ class Controller
 	 * Method executed following any request handling. This method is
 	 * expected to return a Response object, which will then be sent
 	 * back to the user.
+	 * @param mixed $returned is the value that was previously returned
+	 * by the routed method.
 	 */
-	public function postRequest(Response $response)
+	public function postRequest($returned)
 	{
+		return $returned;
 	}
 }
 

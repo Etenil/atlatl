@@ -163,6 +163,7 @@ class Core {
             if(method_exists($obj, $method)) {
                 $response = call_user_func_array(array($obj, $method),
 												 array_slice($matches, 1));
+				$response = $obj->postRequest($response);
 				if(gettype($response) == 'string') {
 					$response = new Response($response);
 				}
@@ -174,8 +175,6 @@ class Core {
 							&& get_class($response) != 'atlatl\Response')) {
 					throw new \Exception('Unknown response.');
 				}
-
-				$obj->postRequest($response);
 				
 				return $response;
             } else {
