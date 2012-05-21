@@ -11,7 +11,7 @@ class TestServer extends PHPUnit_Framework_TestCase
                               'FCGI_ROLE' => 'RESPONDER',
                               'SCRIPT_FILENAME' => '/var/www/test.php',
                               'QUERY_STRING' => '',
-                              'REQUEST_METHOD' => 'GET',
+                              'REQUEST_METHOD' => 'get',
                               'CONTENT_TYPE' => '',
                               'CONTENT_LENGTH' => '',
                               'SCRIPT_NAME' => '/test.php',
@@ -38,7 +38,7 @@ class TestServer extends PHPUnit_Framework_TestCase
                               'HTTP_CACHE_CONTROL' => 'max-age=0',
                               'PHP_SELF' => '/test.php',
                               'REQUEST_TIME' => 1336489852);
-		$server = new Movicon\Server($server_vars);
+		$server = new atlatl\Server($server_vars);
 
 		$this->assertEquals('movicontest', $server->getHost());
         $this->assertEquals('/var/www/test.php', $server->getFilename());

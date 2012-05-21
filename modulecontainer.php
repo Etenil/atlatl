@@ -57,7 +57,7 @@ class ModuleContainer
 	 * @param $modulename is the name of the module.
 	 * @param $module is an instance of a module.
 	 */
-	protected function add_to_list($modulename, Module $module)
+	public function add_to_list($modulename, Module $module)
 	{
 		$this->modules[$modulename] = $module;
 	}
@@ -76,14 +76,14 @@ class ModuleContainer
 	 * @param $method_name is the method to be used on all modules.
 	 * @param $params is an array of parameters to pass to all methods.
 	 */
-	protected function runMethod($method_name, array $params = NULL)
+	public function runMethod($method_name, array $params = NULL)
 	{
 		if($params == NULL) {
 			$params = array();
 		}
-		
-		for($i = 0; $i < count($this->modules); $i++) {
-			call_user_func_array(array($this->modules[$i], $method_name), $params);
+
+        foreach($this->modules as $module) {
+			call_user_func_array(array($module, $method_name), $params);
 		}
 	}
 
@@ -98,8 +98,8 @@ class ModuleContainer
 	{ $this->runMethod('postRouting', func_get_args()); }
 
 	public function preView($path, Request $request)
-	{ $this->runMethod('preView', func_get_args()); }		
-	
+	{ $this->runMethod('preView', func_get_args()); }
+
 	public function postView($path, Request $request, Response $response)
 	{ $this->runMethod('postView', func_get_args()); }
 }

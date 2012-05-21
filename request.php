@@ -5,7 +5,7 @@ namespace atlatl;
 require('security.php');
 
 /**
- * Abstraction of a 
+ * Abstraction of a
  *
  * Controllers are used to process incoming events. This is the basic
  * implementation that all controllers should extend. Some helper functions
@@ -65,7 +65,7 @@ class Request
 	public function post($varname, $default = false)
 	{
 		if(isset($this->postvars[$varname])) {
-			return $this->getvars[$varname];
+			return $this->postvars[$varname];
 		} else {
 			return $default;
 		}
