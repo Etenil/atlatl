@@ -1,10 +1,16 @@
 <?php
 
+/**
+ * Atlatl basic module implementation.
+ */
+
 namespace atlatl;
 
 /**
- * Atlatl module interface.
+ * This is a basic blank module for Atlatl. It needs to be extended in
+ * order to write new modules.
  *
+ * @copyright
  * This file is part of Atlatl
  *
  * Atlatl is free software: you can redistribute it and/or modify
@@ -23,6 +29,8 @@ class Module
 {
 	/**
 	 * Default module constructor. Loads options into properties.
+     * @param array $options is an associative array whose keys will
+     * be mapped to properties for speed populating of the object.
 	 */
 	public function __construct($options = NULL)
 	{
@@ -34,11 +42,53 @@ class Module
 			}
 		}
 	}
-	
+
+    /**
+     * Method called when the module gets initialised. Put custom code
+     * here instead of __construct unless you're sure of what you do.
+     */
 	public function init() {}
+
+    /**
+     * Pre-routing hook. This gets called prior to the routing
+     * callback.
+     * @param string $path is the application path.
+     * @param string $route is the route that is being queried.
+     * @param Request $request is the request object that will be
+     * processed.
+     */
 	public function preRouting($path, $route, Request $request) {}
+
+    /**
+     * Post-routing hook. This gets called after the routing
+     * callback.
+     * @param string $path is the application path.
+     * @param string $route is the route that is being queried.
+     * @param Request $request is the request object that will be
+     * processed.
+     * @param Response $response is the HTTP response produced by the
+     * controller.
+     */
 	public function postRouting($path, $route, Request $request, Response $response) {}
+
+    /**
+     * Pre-view hook. Gets called just before processing the
+     * view.
+     * @param string $path is the requested view's path.
+     * @param Request $request is the HTTP Request object currently
+     * being handled.
+     */
 	public function preView($path, Request $request) {}
+
+    /**
+     * Post-view hook. Gets called just after having processed the
+     * view.
+     * @param string $path is the requested view's path.
+     * @param Request $request is the HTTP Request object currently
+     * being handled.
+     * @param Response response is the HTTP Response produced by the
+     * view.
+     */
 	public function postView($path, Request $request, Response $response) {}
 }
 

@@ -1,14 +1,16 @@
 <?php
 
+/**
+ * Core routing functionality.
+ */
 
 namespace atlatl;
 
 /**
- * Core routing functionality.
- *
  * HTTP requests are routed from this class and the Atlatl core jump
  * started from here.
  *
+ * @copyright
  * This file is part of Atlatl.
  *
  * Atlatl is free software: you can redistribute it and/or modify
@@ -24,15 +26,21 @@ namespace atlatl;
  * along with Atlatl.  If not, see <http://www.gnu.org/licenses/>.
  */
 class Core {
-    // URL prefix.
+    /** URL prefix. */
     protected $prefix = "";
+    /** Server object. */
 	protected $server;
+    /** Request being handled. */
 	protected $request;
+    /** Container of modules. */
 	protected $modules;
 
     /**
      * Class constructor.
      * @param string $prefix is the URL prefix to use for this application.
+     * @param Server $server is a Server object. Default abstracts $_SERVER.
+     * @param Request $request is the HTTP Request to handle. Default
+     * is generated from superglobals.
      */
     public function __construct($prefix = "", Server $server = null, Request $request = null)
     {
@@ -53,11 +61,21 @@ class Core {
 		$this->modules = new ModuleContainer();
     }
 
+    /**
+     * Instanciates a new module and adds it to the collection.
+     * @param string $module is the module's name.
+     * @param array $options is an array of options passed to the
+     * module's constructor.
+     */
 	public function loadModule($module, $options = NULL)
 	{
 		$this->modules->addModule($module, $options);
 	}
 
+    /**
+     * Replaces the current modules container by the provided one.
+     * @param ModuleContainer $container is a container of modules.
+     */
 	public function setModules(ModuleContainer $container)
 	{
 		$this->modules = $container;
@@ -87,6 +105,8 @@ class Core {
 
 	/**
 	 * Serves the requests.
+     * @param array $urls is an associative arrays of regexes and
+     * callbacks for routing.
 	 */
 	function serve(array $urls)
 	{

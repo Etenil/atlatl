@@ -1,10 +1,12 @@
 <?php
 
+/**
+ * Abstraction of an HTTP response.
+ */
+
 namespace atlatl;
 
 /**
- * Abstraction of an HTTP response.
- *
  * This file is part of Atlatl.
  *
  * Atlatl is free software: you can redistribute it and/or modify
@@ -21,15 +23,31 @@ namespace atlatl;
  */
 class Response
 {
+    /** HTTP headers array. */
 	protected $headers;
+    /** HTTP status code as integer. */
 	protected $status_code;
+    /** HTTP response's body string. */
 	protected $body;
+    /** Content type header. */
 	protected $content_type;
 
+    /** Array of session variables. */
     protected $sessionvars;
+    /** Array of cookie variables. */
     protected $cookievars;
+    /** Has the session been started? */
     protected $start_session;
 
+    /**
+     * Instanciates an HTTP response.
+     * @param string $body initiates the body content if any. Default is ''.
+     * @param integer $status_code is the initial HTTP status code. Default is 200.
+     * @param string $content_type is the initial content-type. Default is 'text/html; charset=UTF-8'.
+     * @param array $cookies is a cookies array. Default is $_COOKIE.
+     * @param array $session is the initial session variable. Default is $_SESSION.
+     * @param boolean $start_session whether to start the session. Default is false.
+     */
 	public function __construct($body = '', $status_code = 200,
 								$content_type = 'text/html; charset=UTF-8',
                                 array $cookies = null, array $session = null,
@@ -61,6 +79,7 @@ class Response
 
 	/**
 	 * Sets the contents of the HTTP response's body.
+     * @param string $data replaces body's contents.
 	 */
 	public function setBody($data)
 	{
@@ -68,6 +87,10 @@ class Response
 		return $this;
 	}
 
+    /**
+     * Retrieves the body.
+     * @return string body
+     */
 	public function getBody()
 	{
 		return $this->body;
@@ -75,6 +98,7 @@ class Response
 
 	/**
 	 * Appends a string to body.
+     * @param string $section will be appended to body.
 	 */
 	public function append($section)
 	{
@@ -84,6 +108,8 @@ class Response
 
 	/**
 	 * Sets a header value.
+     * @param string $name is the session variable's name.
+     * @param mixed $value is the value to assign to $name.
 	 */
 	public function setHeader($name, $value)
 	{
@@ -91,6 +117,11 @@ class Response
 		return $this;
 	}
 
+    /**
+     * Retrieves a header's value.
+     * @param string $name is the header's name.
+     * @return mixed the header variable's value or FALSE if not found.
+     */
 	public function getHeader($name)
 	{
 		if(isset($this->headers[$name])) {
@@ -100,6 +131,10 @@ class Response
 		}
 	}
 
+    /**
+     * Returns an array containing all headers.
+     * @return array headers.
+     */
 	public function getHeaders()
 	{
 		return $this->headers;
@@ -161,11 +196,18 @@ class Response
         }
     }
 
+    /**
+     * Has a session been started?
+     * @return boolean TRUE if a session was started.
+     */
     public function hasSession()
     {
         return $this->start_session;
     }
 
+    /**
+     * Fetches the HTTP full status as string from the current integer status.
+     */
 	protected function httpStatus()
 	{
 		$statuses = array(

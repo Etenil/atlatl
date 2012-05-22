@@ -1,14 +1,17 @@
 <?php
 
+/**
+ * Basic implementation of a controller.
+ */
+
 namespace atlatl;
 
 /**
- * Basic implementation of a Controller.
- *
  * Controllers are used to process incoming events. This is the basic
  * implementation that all controllers should extend. Some helper functions
  * are provided.
  *
+ * @copyright
  * This file is part of Atlatl.
  *
  * Atlatl is free software: you can redistribute it and/or modify
@@ -25,11 +28,21 @@ namespace atlatl;
  */
 class Controller
 {
+    /** Object that contains loaded modules. */
 	protected $modules;
+    /** Server state variable. */
 	protected $server;
+    /** Current request object. */
 	protected $request;
+    /** Security provider. */
 	protected $sec;
 
+    /**
+     * Controller's constructor. This is meant to be called by Core.
+     * @param ModuleContainer $modules is a container of loaded modules.
+     * @param Server $server is the current server state.
+     * @param Request $request is the current request object.
+     */
 	public function __construct(ModuleContainer $modules, Server $server, Request $request)
 	{
 		$this->modules = $modules;
@@ -41,10 +54,21 @@ class Controller
         $this->_init();
 	}
 
+    /**
+     * This is run after the constructor. Implement to have custom code run.
+     */
     protected function _init()
     {
     }
 
+    /**
+     * Tiny wrapper arround var_dump to ease debugging.
+     * @param mixed $var is the variable to be dumped
+     * @param boolean $no_html defines whether the variable contains
+     * messy HTML characters or not. The given $var will be escaped if
+     * set to false. Default is false.
+     * @return The HTML code of a human representation of the $var.
+     */
 	protected function dump($var, $no_html = false)
 	{
 		$dump = var_export($var, true);

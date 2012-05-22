@@ -1,10 +1,12 @@
 <?php
 
+/**
+ * Security functions.
+ */
+
 namespace atlatl;
 
 /**
- * Security functions.
- *
  * This class integrates functions to secure strings and request
  * parameters to compensate for PHP's inability to do this on its
  * own.

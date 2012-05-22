@@ -1,14 +1,16 @@
 <?php
 
+/**
+ * Abstraction of an HTTP request.
+ */
+
 namespace atlatl;
 
+
 /**
- * Abstraction of a
+ * This is an object-orientated abstraction of an HTTP request.
  *
- * Controllers are used to process incoming events. This is the basic
- * implementation that all controllers should extend. Some helper functions
- * are provided.
- *
+ * @copyright
  * This file is part of Atlatl.
  *
  * Atlatl is free software: you can redistribute it and/or modify
@@ -25,7 +27,9 @@ namespace atlatl;
  */
 class Request
 {
+    /** Stores the GET variables. */
 	protected $getvars;
+    /** Stores the POST variables. */
 	protected $postvars;
 
 	/**
