@@ -272,7 +272,7 @@ class Response
 		header('HTTP/1.1 ' . $this->httpStatus());
 		header('Content-Type: ' . $this->content_type);
 		foreach($this->headers as $hdrkey => $hdrval) {
-			header($hdrkey, $hdrval);
+			header($hdrkey . ': ' . $hdrval);
 		}
 
         $_COOKIE = array_merge($_COOKIE, $this->cookievars);

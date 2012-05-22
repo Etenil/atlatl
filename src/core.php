@@ -35,6 +35,11 @@ class Core {
     /** Container of modules. */
 	protected $modules;
 
+    /** Callable variable that handles 404 errors. */
+    protected $error404;
+    /** Callable variable that handles 500 errors. */
+    protected $error500;
+
     /**
      * Class constructor.
      * @param string $prefix is the URL prefix to use for this application.
@@ -58,7 +63,35 @@ class Core {
 			$this->request = new Request($_GET, $_POST, $_COOKIE);
 		}
 
+        $this->register404(function(\Exception $e) {
+                return new Response('404 Error - Page not found.', 404);
+            });
+
+        $this->register500(function(\Exception $e) {
+                return new Response('500 Error - Server error.', 500);
+            });
+
 		$this->modules = new ModuleContainer();
+    }
+
+    /**
+     * Sets a new handler for 404 errors.
+     * @param callable $handler will be called in the event of a 404
+     * error. This callable must accept one Exception parameter.
+     */
+    public function register404($handler)
+    {
+        $this->error404 = $handler;
+    }
+
+    /**
+     * Sets a new handler for 500 errors.
+     * @param callable $handler will be called in the event of a 500
+     * error. This callable must accept one Exception parameter.
+     */
+    public function register500($handler)
+    {
+        $this->error500 = $handler;
     }
 
     /**
@@ -110,7 +143,23 @@ class Core {
 	 */
 	function serve(array $urls)
 	{
-		$this->route($urls)->compile();
+        $response = null;
+
+        try {
+            $response = $this->route($urls);
+        }
+        catch(HttpRedirect $r) {
+            $response = new Response();
+            $response->setHeader('Location', $r->getUrl());
+        }
+        catch(NoRouteException $e) {
+            $response = call_user_func($this->error404, $e);
+        }
+        catch(\Exception $e) {
+            $response = call_user_func($this->error500, $e);
+        }
+
+        $response->compile();
 	}
 
     /**
@@ -119,8 +168,8 @@ class Core {
      * The main method of the Core class.
      *
      * @param   array    	$urls  	    The regex-based url to class mapping
-     * @throws  Exception               Thrown if corresponding class is not found
-     * @throws  Exception               Thrown if no match is found
+     * @throws  NoHandlerException      Thrown if corresponding class is not found
+     * @throws  NoRouteException        Thrown if no match is found
      * @throws  BadMethodCallException  Thrown if a corresponding GET,POST is not found
      *
      */
@@ -163,7 +212,7 @@ class Core {
 
         // If we don't have a call at this point, that's a 404.
         if(!$call) {
-            throw new \Exception("URL, $path, not found.");
+            throw new NoRouteException("URL, $path, not found.");
         }
 
         list($class, $method) = explode('::', $call);
@@ -186,7 +235,7 @@ class Core {
 				else if(gettype($response) != 'object'
 						|| (gettype($response) == 'object'
 							&& get_class($response) != 'atlatl\Response')) {
-					throw new \Exception('Unknown response.');
+					throw new IllegalResponseException('Unknown response.');
 				}
 
 				return $response;
@@ -194,7 +243,7 @@ class Core {
                 throw new \BadMethodCallException("Method, $method, not supported.");
             }
         } else {
-            throw new \Exception("Class, $class, not found.");
+            throw new NoHandlerException("Class, $class, not found.");
         }
     }
 }
