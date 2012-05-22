@@ -37,32 +37,33 @@ class Response
     /** Array of cookie variables. */
     protected $cookievars;
     /** Has the session been started? */
-    protected $start_session;
+    protected $use_session;
 
     /**
      * Instanciates an HTTP response.
-     * @param string $body initiates the body content if any. Default is ''.
-     * @param integer $status_code is the initial HTTP status code. Default is 200.
-     * @param string $content_type is the initial content-type. Default is 'text/html; charset=UTF-8'.
+     * @param string $body initiates the body content if any. Default
+     * is ''.
+     * @param integer $status_code is the initial HTTP status
+     * code. Default is 200.
+     * @param string $content_type is the initial
+     * content-type. Default is 'text/html; charset=UTF-8'.
      * @param array $cookies is a cookies array. Default is $_COOKIE.
-     * @param array $session is the initial session variable. Default is $_SESSION.
-     * @param boolean $start_session whether to start the session. Default is false.
+     * @param array $session is the initial session variable. Default
+     * is $_SESSION if PHP's session was started.
      */
 	public function __construct($body = '', $status_code = 200,
 								$content_type = 'text/html; charset=UTF-8',
-                                array $cookies = null, array $session = null,
-                                $start_session = false)
+                                array $cookies = null,
+                                array $session = null)
 	{
 		$this->status_code = $status_code;
 		$this->content_type = $content_type;
 		$this->headers = array();
 		$this->body = $body;
+        $this->use_session = false;
 
-        $this->start_session = false;
-        if($session) {
-            $this->sessionvars = $session;
-        }
-        else if($start_session) {
+        if(session_status() == PHP_SESSION_ACTIVE) {
+            $this->use_session = true;
             $this->sessionvars = $_SESSION;
         }
 
@@ -70,10 +71,6 @@ class Response
             $this->cookievars = $cookies;
         } else {
             $this->cookievars = $_COOKIE;
-        }
-
-        if($start_session) {
-            $this->startSession();
         }
 	}
 
@@ -108,7 +105,7 @@ class Response
 
 	/**
 	 * Sets a header value.
-     * @param string $name is the session variable's name.
+     * @param string $name is the header variable's name.
      * @param mixed $value is the value to assign to $name.
 	 */
 	public function setHeader($name, $value)
@@ -141,27 +138,26 @@ class Response
 	}
 
     /**
-     * Initiates a session.
-     */
-    public function startSession()
-    {
-        $this->start_session = true;
-    }
-
-    /**
      * Sets a SESSION variable.
      * @param varname is the variable's name.
      * @param varval is the value to assign to the variable.
+     * @return FALSE if session isn't started.
      */
     public function setSession($varname, $varval)
     {
-        $this->sessionvars[$varname] = $varval;
+        if($this->use_session) {
+            $this->sessionvars[$varname] = $varval;
+            return $this;
+        } else {
+            return false;
+        }
     }
 
     /**
      * Retrieves the value of a session variable.
      * @param $varname is the variable's name
      * @param $default is the default value to be returned.
+     * @return the session variable or FALSE if it can't be retrieved.
      */
     public function getSession($varname, $default = false)
     {
@@ -179,7 +175,7 @@ class Response
      */
     public function setCookie($varname, $varval)
     {
-        $this->sessionvars[$varname] = $varval;
+        $this->cookievars[$varname] = $varval;
     }
 
     /**
@@ -189,8 +185,8 @@ class Response
      */
     public function getCookie($varname, $default = false)
     {
-        if(isset($this->sessionvars[$varname])) {
-            return $this->sessionvars[$varname];
+        if(isset($this->cookievars[$varname])) {
+            return $this->cookievars[$varname];
         } else {
             return false;
         }
@@ -202,7 +198,7 @@ class Response
      */
     public function hasSession()
     {
-        return $this->start_session;
+        return $this->use_session;
     }
 
     /**
@@ -262,8 +258,7 @@ class Response
 	public function compile()
 	{
         // Starting session first.
-        if($this->start_session) {
-            session_start();
+        if($this->use_session) {
             $_SESSION = array_merge($_SESSION, $this->sessionvars);
         }
 
