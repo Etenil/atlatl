@@ -62,8 +62,15 @@ class Response
 		$this->body = $body;
         $this->use_session = false;
 
-        if(session_status() == PHP_SESSION_ACTIVE) {
+        // PHP 5.4+ only.
+        if(function_exists('session_status') && session_status() == PHP_SESSION_ACTIVE) {
             $this->use_session = true;
+        }
+        else if(isset($_SESSION)) {
+            $this->use_session = true;
+        }
+
+        if($this->use_session) {
             $this->sessionvars = $_SESSION;
         }
 
