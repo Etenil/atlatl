@@ -3,13 +3,6 @@
 
 namespace atlatl;
 
-require_once('server.php');
-require_once('request.php');
-require_once('response.php');
-require_once('controller.php');
-require_once('modulecontainer.php');
-require_once('module.php');
-
 /**
  * Core routing functionality.
  *

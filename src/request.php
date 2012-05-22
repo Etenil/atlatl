@@ -2,8 +2,6 @@
 
 namespace atlatl;
 
-require('security.php');
-
 /**
  * Abstraction of a
  *

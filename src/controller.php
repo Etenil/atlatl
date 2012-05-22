@@ -2,8 +2,6 @@
 
 namespace atlatl;
 
-require_once('security.php');
-
 /**
  * Basic implementation of a Controller.
  *
