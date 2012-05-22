@@ -26,6 +26,7 @@ namespace atlatl;
  */
 class HttpRedirect extends \Exception
 {
+    /** The URL to redirect to. */
     protected $url;
 
     /**
