@@ -3,6 +3,8 @@
 /**
  * Multiple exceptions for Atlatl.
  *
+ * @package exceptions
+ *
  * @copyright
  * This file is part of Atlatl.
  *

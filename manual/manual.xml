@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+               "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <bookinfo>
+    <title>Atlatl</title>
+    <author>
+      <firstname>Guillaume</firstname>
+      <surname>Pasquet</surname>
+    </author>
+  </bookinfo>
+  <chapter>
+    <title>Introduction</title>
+    <para>
+      PHP is a simple and fast interpreted language and templating engine for the web. Its ubiquity make it a language to be reckoned with. However, it is technically lacking in many respects. Particularly on the semantic consistency and security.
+    </para>
+    <para>
+      Thus, many frameworks, collections of libraries, appeared. Those quickly became very popular, and they grew tremendously. So much so that frameworks have started to pull their components apart, and provide a clean and lean core, called a <emphasis>micro-framework</emphasis>, along with a large middleware layer that turn the <emphasis>micro-framework</emphasis> into the full-blown framework.
+    </para>
+    <para>
+      Atlatl is one such micro-framework. It is the core of Assegai, a larger and more structured framework. This manual documents only Atlatl and how to create web applications with it.
+    </para>
+  </chapter>
+
+  <chapter>
+    <title>Hello world</title>
+    <para>
+      This chapter gives a practical approach to creating a simple application with Atlatl.
+    </para>
+    <para>
+      First of all, you need to download and install Atlatl onto your machine. Clone the Atlatl repository at <ulink url="http://pikacode.com/etenil/atlatl">http://pikacode.com/etenil/atlatl</ulink> with mercurial.
+    </para>
+    <para>
+      Atlatl does not dictate a particular project structure nor to have your source files anywhere in particular. All you need to do is to include or require <filename>loader.php</filename> within the Atlatl folder.
+    </para>
+    <para>
+      In order to respond to requests, you will need to create a controller that extends <type>atlatl\Controller</type>, a blank implementation of a controller.
+    </para>
+    <para>
+      The controller's methods will be routed to following a routing table that you need to define.
+    </para>
+    <para>
+      Then, you can instanciate an <type>atlatl\Core</type> object and call the <function>serve</function> method on it, passing the routing table as parameter.
+    </para>
+
+    <example>
+      <title>A very simple working controller</title>
+      <programlisting>
+require('atlatl/loader.php');
+
+class Hello extends atlatl\Controller
+{
+    function greet()
+    {
+        return "Hello, world";
+    }
+}
+
+$route = array(
+    '/' => 'Hello::greet',
+    );
+
+$srv = new atlatl\Core();
+$srv->serve($route);
+      </programlisting>
+    </example>
+
+    <para>
+      Routes are regular expressions, and we can capture parts of them to pass them to handling methods. Thus, we can easily create a custom greeter like in example 2-2.
+    </para>
+
+    <example>
+      <title>Custom greeter</title>
+      <programlisting>
+require('atlatl/loader.php');
+
+class Hello extends atlatl\Controller
+{
+    function greet()
+    {
+        return "Hello, world";
+    }
+
+    function greetPerson($name)
+    {
+        return "Hello, " . $name;
+    }
+}
+
+$route = array(
+    '/' => 'Hello::greet',
+    '/(.+)' => 'Hello::greetPerson',
+    );
+
+$srv = new atlatl\Core();
+$srv->serve($route);
+      </programlisting>
+    </example>
+  </chapter>
+
+  <chapter>
+    <title>Routes</title>
+
+    <section>
+      <title>Definition</title>
+      <para>
+        Routes are defined by the association of a regular expression to the definition of a controller's method. When a request that matches the route is received, the controller is instantiated and its method called.
+      </para>
+      <para>
+        Routes definitions may use capturing groups. The matches are mapped on to the controller's method's parameters directly.
+      </para>
+      <para>
+        Routes don't necessarily need to point to object's methods that extend <type>atlatl\Controller</type>, but it is advised to use those.
+      </para>
+    </section>
+
+    <section>
+      <title>Method</title>
+      <para>
+        The routing can be done either for all types of requests, or based on the request type. Request types can be any of those supported in the HTTP specification.
+      </para>
+      <para>
+        Specifying a route method is just a matter of prepending the method type to the route with a colon.
+      </para>
+
+      <informalexample>
+        <programlisting>
+          $route = array(
+              '/'      => 'Controller::method',
+              'GET:/'  => 'Controller::method',
+              'POST:/' => 'Controller::method',
+              );
+        </programlisting>
+      </informalexample>
+
+      <para>
+        Requests will be handled by their method-specific route if defined. If a method-specific route cannot be found, then the generic route definition will be used.
+      </para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Controller</title>
+    <para>
+      Atlatl provides the basic implementation of a controller. While you don't have to use it for your own controllers, it is advised to do so to benefit from some of the other features (such as security).
+    </para>
+    <section>
+      <title>Initialiser</title>
+      <para>
+        The default controller implementation defines the method <function>_init()</function>, which is called by the default contructor. It is advised to overload this method rather than modifying the constructor if you need to do anything upon the controller's instanciation.
+      </para>
+    </section>
+  </chapter>
+</book>
