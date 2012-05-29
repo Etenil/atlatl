@@ -34,13 +34,13 @@
       Atlatl does not dictate a particular project structure nor to have your source files anywhere in particular. All you need to do is to include or require <filename>loader.php</filename> within the Atlatl folder.
     </para>
     <para>
-      In order to respond to requests, you will need to create a controller that extends <type>atlatl\Controller</type>, a blank implementation of a controller.
+      In order to respond to requests, you will need to create a controller that extends <classname>atlatl\Controller</classname>, a blank implementation of a controller.
     </para>
     <para>
       The controller's methods will be routed to following a routing table that you need to define.
     </para>
     <para>
-      Then, you can instanciate an <type>atlatl\Core</type> object and call the <function>serve</function> method on it, passing the routing table as parameter.
+      Then, you can instanciate an <classname>atlatl\Core</classname> object and call the <function>serve</function> method on it, passing the routing table as parameter.
     </para>
 
     <example>
@@ -110,7 +110,7 @@ $srv->serve($route);
         Routes definitions may use capturing groups. The matches are mapped on to the controller's method's parameters directly.
       </para>
       <para>
-        Routes don't necessarily need to point to object's methods that extend <type>atlatl\Controller</type>, but it is advised to use those.
+        Routes don't necessarily need to point to object's methods that extend <classname>atlatl\Controller</classname>, but it is advised to use those.
       </para>
     </section>
 
@@ -149,6 +149,102 @@ $srv->serve($route);
       <para>
         The default controller implementation defines the method <function>_init()</function>, which is called by the default contructor. It is advised to overload this method rather than modifying the constructor if you need to do anything upon the controller's instanciation.
       </para>
+    </section>
+    <section>
+      <title>Handlers</title>
+      <para>
+        Handlers are methods which are expected to either return a <classname>string</classname> or an <classname>atlatl\Response</classname> object.
+      </para>
+    </section>
+    <section>
+      <title>Request handling hooks</title>
+      <para>
+        The default controller implementation defines two blank hooks that get called before and after each requests. These are <function>preRequest</function> and <function>postRequest</function>.
+      </para>
+      <para>
+        The <function>preRequest</function> function does not take any argument and is not expected to return any value. It is useful to set up properties of the controller or sort out some side effects before handling the request.
+      </para>
+      <para>
+        The other hook, <function>postRequest</function> takes a <type>mixed</type> parameter that is the value returned by the handler. The hook is expected to return a <classname>atlatl\Response</classname> object or a string that will then be sent back to the client.
+      </para>
+    </section>
+    <section>
+      <title>Dump</title>
+      <para>
+        In order to help with debugging, <function>atlatl\Controller</function> provides the <function>dump</function> method. A convenience helper that outputs HTML-friendly dumps of variables.
+      </para>
+    </section>
+    <section>
+      <title>Helpers</title>
+      <para>
+        Controllers are instanciated with <classname>atlalt\Request</classname>, <classname>atlatl\Server</classname>, <classname>atlatl\Security</classname> and <classname>atlatl\ModuleContainer</classname> helpers.
+      </para>
+      <para>
+        They are instanciated as properties of the current container using with the following self-explanatory names:
+      </para>
+      <itemizedlist>
+        <listitem>
+          <para>
+            <varname>modules</varname>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <varname>server</varname>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <varname>request</varname>
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            <varname>sec</varname>
+          </para>
+        </listitem>
+      </itemizedlist>
+      <para>
+        Refer to their respective chapters for more information.
+      </para>
+    </section>
+  </chapter>
+  <chapter>
+    <title>Server Information</title>
+    <para>
+      Atlatl abstracts all server information into a <classname>atlatl\Server</classname> object.
+    </para>
+  </chapter>
+  <chapter>
+    <title>Modules</title>
+    <section>
+      <title>Using modules</title>
+      <para>
+        Loaded modules are accessible from the controller as a <classname>atlatl\ModuleContainer</classname> property. many different actions can be performed on individual modules; refer to the modules documentation for more details.
+      </para>
+      <para>
+        The <classname>atlatl\ModuleContainer</classname> object offers the possibility to run a generic method on all instanciated modules.
+      </para>
+      <example>
+        <title>Using modules from a controller</title>
+        <programlisting>
+class Stuff extends atlatl\Controller
+{
+    function myHandler()
+    {
+        // Retrieving data from the pdo module.
+        $table = $this->modules->pdo->query('SELECT * FROM data');
+
+        // Closing all database connections.
+        $this->modules->runMethod('close');
+    }
+}
+        </programlisting>
+      </example>
+    </section>
+    <section>
+      <title>Writing new modules</title>
+      <para>There is no cake...</para>
     </section>
   </chapter>
 </book>
