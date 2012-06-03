@@ -48,7 +48,7 @@ This is Atlatl @value{VERSION}'s manual.
 * introduction::       What is Atlatl?
 * hello-world::        A hands-on discovery of Atlatl
 * routes::             How to route requests
-* controller::         How to use controllers
+* handlers::           Handling requests
 * server::             Retrieving server data
 * modules::            Creating and using modules
 @end menu
@@ -188,30 +188,38 @@ Requests will be handled by their method-specific route if
 defined. If a method-specific route cannot be found, then the
 generic route definition will be used.
 
-@node controller
-@chapter Controller
-Atlatl provides the basic implementation of a controller. While
-you don't have to use it for your own controllers, it is advised
-to do so to benefit from some of the other features (such as
-security).
+@node handlers
+@chapter Handlers
+Atlatl does not provide any strict definition of a handler. You can
+use any construct that can be called upon.
 
-@section Initialiser
-The default controller implementation defines the method
-@code{_init()}, which is called by the default
-contructor. It is advised to overload this method rather than
-modifying the constructor if you need to do anything upon the
-controller's instanciation.
+A handler can be a closure, a function's name, an array with a
+classname as first element and the method to call as second element,
+or a method definition string such as @code{class::method}.
 
-@section Handlers
-Handlers are methods which are expected to either return a
+If the handler is an object's method, Atlatl will instanciate the
+object for you. The constructor is then called with the three
+following arguments.
+
+@itemize @code
+@item modules
+@item server
+@item request
+@item sec
+@end itemize
+
+However, if the handler is a function or a closure, the first
+parameter passed is an object with public properties as previously
+described in the parameters list.
+
+Handlers are expected to either return a
 @code{string} or an
 @code{atlatl\Response} object.
 
 @section Request handling hooks
-The default controller implementation defines two blank hooks
-that get called before and after each requests. These are
-@code{preRequest} and
-@code{postRequest}.
+When routing the request, the core routine will call the two methods
+@code{preRequest} and @code{postRequest} if they exist. Respectively
+before and after routing the request.
 
 The @code{preRequest} function does not take any
 argument and is not expected to return any value. It is useful
@@ -224,16 +232,10 @@ handler. The hook is expected to return a
 @code{atlatl\Response} object or a string that
 will then be sent back to the client.
 
-@section Dump
-In order to help with debugging,
-@code{atlatl\Controller} provides the
-@code{dump} method. A convenience helper that
-outputs HTML-friendly dumps of variables.
-
 @section Helpers
-Controllers are instanciated with
+Handlers are passed the three helpers
 @code{atlalt\Request}, @code{atlatl\Server}, @code{atlatl\Security}
-and @code{atlatl\ModuleContainer} helpers.
+and @code{atlatl\ModuleContainer}.
 
 They are instanciated as properties of the current container
 using with the following self-explanatory names:

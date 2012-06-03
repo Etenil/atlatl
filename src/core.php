@@ -219,37 +219,44 @@ class Core {
          * anything PHP defines as a 'callable', or in the form class::method. */
         $class = '';
         $method = '';
-        
-        if(is_callable($call)) {
-            $method = $call;
+
+
+        if(is_string($call) && preg_match('/^.+::.+$/', trim($call))) {
+            list($class, $method) = explode('::', $call);
         }
         else if(is_array($call)) {
             $class = $call[0];
             $method = $call[1];
         }
-        else if(is_string($call) && preg_match('/^.+::.+$/', trim($call))) {
-            list($class, $method) = explode('::', $call);
+        else if(is_callable($call)) {
+            $method = $call;
         }
 
         $response = null;
+
+        var_dump($class);
         
         if(!$class) { // Just a function call (or a closure?). Less hooks obviously.
             // Mounting system stuff into an object and generating the parameters.
             $params = array_merge(array((object)array('modules' => $this->modules,
                                                       'server'  => $this->server,
-                                                      'request' => $this->request)),
+                                                      'request' => $this->request,
+                                                      'sec'     => new Security())),
                                         array_slice($matches, 1));
             $response = call_user_func_array($method, $params);
         }
         else if(class_exists($class)) {
-            $obj = new $class($this->modules, $this->server, $this->request);
+            $obj = new $class($this->modules, $this->server,
+                              $this->request, new Security());
 
-			$obj->preRequest();
+            if(method_exists($obj, 'preRequest'))
+                $obj->preRequest();
 
             if(method_exists($obj, $method)) {
                 $response = call_user_func_array(array($obj, $method),
 												 array_slice($matches, 1));
-				$response = $obj->postRequest($response);
+                if(method_exists($obj, 'postRequest'))
+                    $response = $obj->postRequest($response);
             } else {
                 throw new \BadMethodCallException("Method, $method, not supported.");
             }
