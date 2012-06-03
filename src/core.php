@@ -215,9 +215,33 @@ class Core {
             throw new NoRouteException("URL, $path, not found.");
         }
 
-        list($class, $method) = explode('::', $call);
+        /* We're accepting different types of handler declarations. It can be
+         * anything PHP defines as a 'callable', or in the form class::method. */
+        $class = '';
+        $method = '';
+        
+        if(is_callable($call)) {
+            $method = $call;
+        }
+        else if(is_array($call)) {
+            $class = $call[0];
+            $method = $call[1];
+        }
+        else if(is_string($call) && preg_match('/^.+::.+$/', trim($call))) {
+            list($class, $method) = explode('::', $call);
+        }
 
-        if(class_exists($class)) {
+        $response = null;
+        
+        if(!$class) { // Just a function call (or a closure?). Less hooks obviously.
+            // Mounting system stuff into an object and generating the parameters.
+            $params = array_merge(array((object)array('modules' => $this->modules,
+                                                      'server'  => $this->server,
+                                                      'request' => $this->request)),
+                                        array_slice($matches, 1));
+            $response = call_user_func_array($method, $params);
+        }
+        else if(class_exists($class)) {
             $obj = new $class($this->modules, $this->server, $this->request);
 
 			$obj->preRequest();
@@ -226,24 +250,26 @@ class Core {
                 $response = call_user_func_array(array($obj, $method),
 												 array_slice($matches, 1));
 				$response = $obj->postRequest($response);
-				if(gettype($response) == 'string') {
-					$response = new Response($response);
-				}
-				else if($response === null) {
-					$response = new Response();
-				}
-				else if(gettype($response) != 'object'
-						|| (gettype($response) == 'object'
-							&& get_class($response) != 'atlatl\Response')) {
-					throw new IllegalResponseException('Unknown response.');
-				}
-
-				return $response;
             } else {
                 throw new \BadMethodCallException("Method, $method, not supported.");
             }
         } else {
             throw new NoHandlerException("Class, $class, not found.");
         }
+
+        // Cleaning up the response...
+        if(gettype($response) == 'string') {
+            $response = new Response($response);
+        }
+        else if($response === null) {
+            $response = new Response();
+        }
+        else if(gettype($response) != 'object'
+                || (gettype($response) == 'object'
+                    && get_class($response) != 'atlatl\Response')) {
+            throw new IllegalResponseException('Unknown response.');
+        }
+        
+        return $response;
     }
 }
