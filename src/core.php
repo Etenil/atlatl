@@ -234,8 +234,6 @@ class Core {
 
         $response = null;
 
-        var_dump($class);
-        
         if(!$class) { // Just a function call (or a closure?). Less hooks obviously.
             // Mounting system stuff into an object and generating the parameters.
             $params = array_merge(array((object)array('modules' => $this->modules,
