@@ -87,13 +87,28 @@ class ModuleContainer
 	 */
 	public function runMethod($method_name, array $params = NULL)
 	{
+        // Prevents annoying notices.
 		if($params == NULL) {
 			$params = array();
 		}
 
-        foreach($this->modules as $module) {
-			call_user_func_array(array($module, $method_name), $params);
+        // We collect the results into an array.
+        $results = array();
+        foreach($this->modules as $name => $module) {
+            if(method_exists($module, $method_name)) {
+                try {
+                    $results[$name] = call_user_func_array(array($module, $method_name), $params);
+                }
+                catch(ModulePreemptException $e) {
+                    return true;
+                }
+                catch(Exception $e) {
+                    $results[$name] = $e;
+                }
+            }
 		}
+
+        return $results;
 	}
 
 	/** Mapped module function call.
@@ -111,7 +126,7 @@ class ModuleContainer
      * processed.
      */
 	public function preRouting($path, $route, Request $request)
-	{ $this->runMethod('preRouting', func_get_args()); }
+	{ return $this->runMethod('preRouting', func_get_args()); }
 
 	/** Mapped module function call.
      * Post-routing hook. This gets called after the routing
@@ -124,7 +139,7 @@ class ModuleContainer
      * controller.
      */
 	public function postRouting($path, $route, Request $request, Response $response)
-	{ $this->runMethod('postRouting', func_get_args()); }
+	{ return $this->runMethod('postRouting', func_get_args()); }
 
 	/** Mapped module function call.
      * Pre-view hook. Gets called just before processing the
@@ -133,20 +148,35 @@ class ModuleContainer
      * @param Request $request is the HTTP Request object currently
      * being handled.
      */
-	public function preView($path, Request $request)
-	{ $this->runMethod('preView', func_get_args()); }
+	public function preView($path, array $vars)
+	{ return $this->runMethod('preView', func_get_args()); }
 
 	/** Mapped module function call.
      * Post-view hook. Gets called just after having processed the
      * view.
      * @param string $path is the requested view's path.
-     * @param Request $request is the HTTP Request object currently
+     * @param array $vars is the HTTP Request object currently
      * being handled.
-     * @param Response response is the HTTP Response produced by the
+     * @param string $result response the HTTP Response produced by the
      * view.
      */
-	public function postView($path, Request $request, Response $response)
-	{ $this->runMethod('postView', func_get_args()); }
+	public function postView($path, array $vars, $result)
+	{ return $this->runMethod('postView', func_get_args()); }
+
+   	/** Mapped module function call.
+     * Pre-model hook. Gets called just before loading a model.
+     * @param string $model_name is the requested model's name.
+     */
+	public function preModel($model_name)
+	{ return $this->runMethod('preModel', func_get_args()); }
+
+	/** Mapped module function call.
+     * Post-model hook. Gets called just after having loaded the
+     * model.
+     * @param string $model_name is the requested model's name.
+     */
+	public function postModel($model_name)
+	{ return $this->runMethod('postView', func_get_args()); }
 }
 
 ?>
