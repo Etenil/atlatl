@@ -127,7 +127,7 @@ class ModuleContainer
      * Method called when the module gets initialised. Put custom code
      * here instead of __construct unless you're sure of what you do.
 	public function init()
-	{ $this->batchRun(true, 'init'); }
+	{ $this->batchRun(true, '_init'); }
 
 	/** Mapped module function call.
      * Pre-routing hook. This gets called prior to the routing

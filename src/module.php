@@ -38,6 +38,15 @@ class Module
 	{
         $this->server = $server;
 
+        $this->_init($options);
+	}
+
+    /**
+     * Method called when the module gets initialised. Put custom code
+     * here instead of __construct unless you're sure of what you do.
+     */
+	public function _init($options)
+    {
 		if(is_array($options)) {
 			foreach($options as $opt_name => $opt_val) {
 				if(property_exists($this, $opt_name)) {
@@ -45,13 +54,7 @@ class Module
 				}
 			}
 		}
-	}
-
-    /**
-     * Method called when the module gets initialised. Put custom code
-     * here instead of __construct unless you're sure of what you do.
-     */
-	public function init() {}
+    }
 
     /**
      * Pre-routing hook. This gets called prior to the routing
