@@ -87,6 +87,17 @@ class ModuleContainer
 	 */
 	public function runMethod($method_name, array $params = NULL)
 	{
+        return $this->batchRun(false, $method_name, $params);
+	}
+
+    /**
+     * Batch runs a method on all modules.
+     * @param bool $is_hook specifies that this is a hook call.
+	 * @param string $method_name is the method to be used on all modules.
+	 * @param array $params is an array of parameters to pass to all methods.
+     */
+	public function batchRun($is_hook, $method_name, array $params = NULL)
+    {
         // Prevents annoying notices.
 		if($params == NULL) {
 			$params = array();
@@ -96,26 +107,25 @@ class ModuleContainer
         $results = array();
         foreach($this->modules as $name => $module) {
             if(method_exists($module, $method_name)) {
-                try {
-                    $results[$name] = call_user_func_array(array($module, $method_name), $params);
-                }
-                catch(ModulePreemptException $e) {
-                    return true;
-                }
-                catch(Exception $e) {
-                    $results[$name] = $e;
+                $result = call_user_func_array(array($module, $method_name), $params);
+                if($is_hook) { // Hooks are pre-emptive if they return something.
+                    if($result) {
+                        return $result;
+                    }
+                } else { // Collecting
+                    $results[$name] = $result;
                 }
             }
 		}
 
-        return $results;
-	}
+        return $is_hook? false : $results;
+    }
 
 	/** Mapped module function call.
      * Method called when the module gets initialised. Put custom code
      * here instead of __construct unless you're sure of what you do.
 	public function init()
-	{ $this->runMethod('init'); }
+	{ $this->batchRun(true, 'init'); }
 
 	/** Mapped module function call.
      * Pre-routing hook. This gets called prior to the routing
@@ -126,7 +136,7 @@ class ModuleContainer
      * processed.
      */
 	public function preRouting($path, $route, Request $request)
-	{ return $this->runMethod('preRouting', func_get_args()); }
+	{ return $this->batchRun(true, 'preRouting', func_get_args()); }
 
 	/** Mapped module function call.
      * Post-routing hook. This gets called after the routing
@@ -139,7 +149,7 @@ class ModuleContainer
      * controller.
      */
 	public function postRouting($path, $route, Request $request, Response $response)
-	{ return $this->runMethod('postRouting', func_get_args()); }
+	{ return $this->batchRun(true, 'postRouting', func_get_args()); }
 
 	/** Mapped module function call.
      * Pre-view hook. Gets called just before processing the
@@ -149,7 +159,7 @@ class ModuleContainer
      * being handled.
      */
 	public function preView(Request $request, $path, $vars)
-	{ return $this->runMethod('preView', func_get_args()); }
+	{ return $this->batchRun(true, 'preView', func_get_args()); }
 
 	/** Mapped module function call.
      * Post-view hook. Gets called just after having processed the
@@ -161,14 +171,14 @@ class ModuleContainer
      * view.
      */
 	public function postView(Request $request, $path, $vars, $result)
-	{ return $this->runMethod('postView', func_get_args()); }
+	{ return $this->batchRun(true, 'postView', func_get_args()); }
 
    	/** Mapped module function call.
      * Pre-model hook. Gets called just before loading a model.
      * @param string $model_name is the requested model's name.
      */
 	public function preModel($model_name)
-	{ return $this->runMethod('preModel', func_get_args()); }
+	{ return $this->batchRun(true, 'preModel', func_get_args()); }
 
 	/** Mapped module function call.
      * Post-model hook. Gets called just after having loaded the
@@ -176,7 +186,7 @@ class ModuleContainer
      * @param string $model_name is the requested model's name.
      */
 	public function postModel($model_name)
-	{ return $this->runMethod('postModel', func_get_args()); }
+	{ return $this->batchRun(true, 'postModel', func_get_args()); }
 }
 
 ?>
