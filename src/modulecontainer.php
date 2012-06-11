@@ -176,7 +176,7 @@ class ModuleContainer
      * @param string $model_name is the requested model's name.
      */
 	public function postModel($model_name)
-	{ return $this->runMethod('postView', func_get_args()); }
+	{ return $this->runMethod('postModel', func_get_args()); }
 }
 
 ?>
