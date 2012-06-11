@@ -71,7 +71,7 @@ class Core {
                 return new Response('500 Error - Server error.', 500);
             });
 
-		$this->modules = new ModuleContainer();
+		$this->modules = new ModuleContainer($this->server);
     }
 
     /**
@@ -153,6 +153,9 @@ class Core {
             $response->setHeader('Location', $r->getUrl());
         }
         catch(NoRouteException $e) {
+            $response = call_user_func($this->error404, $e);
+        }
+        catch(NoViewException $e) {
             $response = call_user_func($this->error404, $e);
         }
         catch(\Exception $e) {

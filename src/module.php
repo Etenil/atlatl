@@ -27,13 +27,17 @@ namespace atlatl;
  */
 class Module
 {
+    protected $server;
+
 	/**
 	 * Default module constructor. Loads options into properties.
      * @param array $options is an associative array whose keys will
      * be mapped to properties for speed populating of the object.
 	 */
-	public function __construct($options = NULL)
+	public function __construct(Server $server, $options = NULL)
 	{
+        $this->server = $server;
+
 		if(is_array($options)) {
 			foreach($options as $opt_name => $opt_val) {
 				if(property_exists($this, $opt_name)) {

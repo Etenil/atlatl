@@ -62,6 +62,12 @@ class NoHandlerException extends \Exception
 {}
 
 /**
+ * View doesn't exist, file not found.
+ */
+class NoViewException extends \Exception
+{}
+
+/**
  * The object returned by a controller cannot be converted to a
  * Response.
  */

@@ -30,12 +30,14 @@ class ModuleContainer
 {
     /** Contains instanciated modules that extend Module.*/
     protected $modules;
+    protected $server;
 
     /**
      * Class constructor. Nothing to say here.
      */
-    public function __construct()
+    public function __construct(Server $server)
     {
+        $this->server = $server;
         $this->modules = array();
     }
 
@@ -58,7 +60,7 @@ class ModuleContainer
 	 * the module's constructor. Default is none.
 	 */
     public function addModule($module, array $options = NULL) {
-		$this->add_to_list($module, new $module($options));
+		$this->add_to_list($module, new $module($this->server, $options));
     }
 
 	/**
