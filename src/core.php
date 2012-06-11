@@ -271,10 +271,11 @@ class Core {
         }
         else if(gettype($response) != 'object'
                 || (gettype($response) == 'object'
-                    && get_class($response) != 'atlatl\Response')) {
+                    && (get_class($response) != 'atlatl\Response'
+                        && !is_subclass_of($response, 'atlatl\Response')))) {
             throw new IllegalResponseException('Unknown response.');
         }
-        
+
         return $response;
     }
 }
