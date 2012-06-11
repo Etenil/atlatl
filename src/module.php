@@ -78,7 +78,7 @@ class Module
      * @param Request $request is the HTTP Request object currently
      * being handled.
      */
-	public function preView($path, Request $request) {}
+	public function preView(Request $request, $path, $vars) {}
 
     /**
      * Post-view hook. Gets called just after having processed the
@@ -89,7 +89,7 @@ class Module
      * @param Response response is the HTTP Response produced by the
      * view.
      */
-	public function postView($path, Request $request, Response $response) {}
+    public function postView(Request $request, $path, $vars, $result) {}
 }
 
 ?>

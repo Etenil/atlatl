@@ -148,7 +148,7 @@ class ModuleContainer
      * @param Request $request is the HTTP Request object currently
      * being handled.
      */
-	public function preView($path, array $vars)
+	public function preView(Request $request, $path, $vars)
 	{ return $this->runMethod('preView', func_get_args()); }
 
 	/** Mapped module function call.
@@ -160,7 +160,7 @@ class ModuleContainer
      * @param string $result response the HTTP Response produced by the
      * view.
      */
-	public function postView($path, array $vars, $result)
+	public function postView(Request $request, $path, $vars, $result)
 	{ return $this->runMethod('postView', func_get_args()); }
 
    	/** Mapped module function call.
