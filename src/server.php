@@ -70,14 +70,17 @@ class Server
 	protected $time;
     /** Requested route. */
 	protected $route;
+    /** Server prefix. */
+    protected $prefix;
 
     /**
      * Constructs the server object.
      * @param array $server is a server state array; typically $_SERVER.
      */
-	public function __construct(array $server)
+	public function __construct(array $server, $prefix = "")
 	{
 		$this->parsevars($server);
+        $this->prefix = $prefix;
 	}
 
 	/**
@@ -172,6 +175,19 @@ class Server
         return file_get_contents('php://input');
     }
 
+    public function siteUrl($url)
+    {
+        $siteurl = $this->getProtocol() . '://' . $this->getHost();
+
+        if($this->getPort() != 80) {
+            $siteurl.= ':' . $this->getPort();
+        }
+
+        $siteurl.= $this->getPrefix() . '/' . $url;
+
+        return $siteurl;
+    }
+
 // Accessors
     /** Accessor for $method. */
 	public function getMethod()
@@ -239,6 +255,9 @@ class Server
     /** Accessor for $route. */
 	public function getRoute()
 	    { return $this->route; }
+    /** Accessor for $prefix. */
+    public function getPrefix()
+        { return $this->prefix; }
 }
 
 ?>

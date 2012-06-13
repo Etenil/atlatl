@@ -49,13 +49,17 @@ class Core {
      */
     public function __construct($prefix = "", Server $server = null, Request $request = null)
     {
-        $this->setPrefix($prefix);
-
 		if($server) {
 			$this->server = $server;
 		} else {
-			$this->server = new Server($_SERVER);
+			$this->server = new Server($_SERVER, $prefix);
 		}
+
+        if(!$prefix) {
+            $this->setPrefix($server->getPrefix());
+        } else {
+            $this->setPrefix($prefix);
+        }
 
 		if($request) {
 			$this->resquet = $request;
