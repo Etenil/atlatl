@@ -28,6 +28,7 @@ namespace atlatl;
 class Module
 {
     protected $server;
+    protected $options;
 
 	/**
 	 * Default module constructor. Loads options into properties.
@@ -37,6 +38,7 @@ class Module
 	public function __construct(Server $server, $options = NULL)
 	{
         $this->server = $server;
+        $this->options = $options;
 
         $this->_init($options);
 	}
@@ -54,6 +56,18 @@ class Module
 				}
 			}
 		}
+    }
+
+    /**
+     * Just a convenient wrapper to retrieve an option.
+     * @param string $option is the option's name to retrieve.
+     * @param mixed $default default value returned if option doesn't
+     * exist. Default is false.
+     * @return the value or default value.
+     */
+    protected function getOption($option, $default = false)
+    {
+        return isset($this->options[$option])? $this->options[$option] : $default;
     }
 
     /**
