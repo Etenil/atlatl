@@ -335,7 +335,7 @@ class Response
 
             // Deleting
             if(count($this->d_sessionvars) > 0) {
-                foreach($d_sessionvars as $var) {
+                foreach($this->d_sessionvars as $var) {
                     $_SESSION[$var] = null;
                     unset($_SESSION[$var]);
                 }
@@ -352,7 +352,7 @@ class Response
 
         // Deleting
         if(count($this->d_cookievars) > 0) {
-            foreach($d_cookievars as $var) {
+            foreach($this->d_cookievars as $var) {
                 $_COOKIE[$var] = null;
                 unset($_COOKIE[$var]);
             }
