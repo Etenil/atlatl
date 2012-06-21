@@ -81,6 +81,17 @@ class Response
         }
 	}
 
+    /**
+     * Redirects to a different page.
+     * @param string $url is the url to redirect to.
+     */
+    public function redirect($url)
+    {
+        $this->setStatus(301);
+        $this->setHeader('Location', $url);
+        return $this;
+    }
+
 	/**
 	 * Sets the contents of the HTTP response's body.
      * @param string $data replaces body's contents.
@@ -209,9 +220,30 @@ class Response
     }
 
     /**
-     * Fetches the HTTP full status as string from the current integer status.
+     * Sets the HTTP status code.
+     * @param int $statuscode is the HTTP status code to be returned.
      */
-	protected function httpStatus()
+    public function setStatus($statuscode)
+    {
+        if($this->httpStatus($statuscode)) {
+            $this->status_code = $statuscode;
+        }
+        return $this;
+    }
+
+    /**
+     * Gets the current HTTP status code.
+     */
+    public function getStatus()
+    {
+        return $this->status_code;
+    }
+
+    /**
+     * Fetches the HTTP full status as string from the current integer status.
+     * @param int $statuscode is the numeric status code to fetch.
+     */
+	protected function httpStatus($statuscode)
 	{
 		$statuses = array(
 			100 => '100 Continue',
@@ -256,7 +288,12 @@ class Response
 			504 => '504 Gateway Timeout',
 			505 => '505 HTTP Version Not Supported'
 			);
-		return $statuses[$this->status_code];
+
+        if(array_key_exists($statuscode, $statuses)) {
+            return $statuses[$statuscode];
+        } else {
+            return false;
+        }
 	}
 
 	/**
@@ -269,7 +306,7 @@ class Response
             $_SESSION = array_merge($_SESSION, $this->sessionvars);
         }
 
-		header('HTTP/1.1 ' . $this->httpStatus());
+		header('HTTP/1.1 ' . $this->httpStatus($this->getStatus()));
 		header('Content-Type: ' . $this->content_type);
 		foreach($this->headers as $hdrkey => $hdrval) {
 			header($hdrkey . ': ' . $hdrval);
