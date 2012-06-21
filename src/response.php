@@ -43,7 +43,7 @@ class Response
     /** Array of cookie variables. */
     protected $cookievars;
     /** Array of cookie variables to be deleted. */
-    protected $d_sessionvars;
+    protected $d_cookievars;
 
     /**
      * Instanciates an HTTP response.
@@ -67,6 +67,8 @@ class Response
 		$this->headers = array();
 		$this->body = $body;
         $this->use_session = false;
+        $this->d_sessionvars = array();
+        $this->d_cookievars = array();
 
         // PHP 5.4+ only.
         if(function_exists('session_status') && session_status() == PHP_SESSION_ACTIVE) {
@@ -186,7 +188,7 @@ class Response
     public function getSession($varname, $default = false)
     {
         if(isset($this->sessionvars[$varname])
-           && !in_array($this->d_sessionvars, $varname)) {
+           && !in_array($varname, $this->d_sessionvars)) {
             return $this->sessionvars[$varname];
         } else {
             return $default;
@@ -229,7 +231,7 @@ class Response
     public function getCookie($varname, $default = false)
     {
         if(isset($this->cookievars[$varname])
-           && !in_array($this->d_cookievars, $varname)) {
+           && !in_array($varname, $this->d_cookievars)) {
             return $this->cookievars[$varname];
         } else {
             return $default;
