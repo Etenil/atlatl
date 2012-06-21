@@ -177,7 +177,8 @@ class Server
 
     public function siteUrl($url)
     {
-        $siteurl = $this->getProtocol() . '://' . $this->getHost();
+        //$siteurl = $this->getProtocol() . '://' . $this->getHost();
+        $siteurl = 'http://' . $this->getHost();
 
         if($this->getPort() != 80) {
             $siteurl.= ':' . $this->getPort();
@@ -258,6 +259,8 @@ class Server
     /** Accessor for $prefix. */
     public function getPrefix()
         { return $this->prefix; }
+    public function setPrefix($val)
+        { $this->prefix = $val; return $this; }
 }
 
 ?>

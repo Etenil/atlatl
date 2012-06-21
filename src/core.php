@@ -59,6 +59,7 @@ class Core {
             $this->setPrefix($server->getPrefix());
         } else {
             $this->setPrefix($prefix);
+            $this->server->setPrefix($prefix);
         }
 
 		if($request) {
