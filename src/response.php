@@ -32,12 +32,18 @@ class Response
     /** Content type header. */
 	protected $content_type;
 
-    /** Array of session variables. */
-    protected $sessionvars;
-    /** Array of cookie variables. */
-    protected $cookievars;
     /** Has the session been started? */
     protected $use_session;
+
+    /** Array of session variables. */
+    protected $sessionvars;
+    /** Array of session variables to be deleted. */
+    protected $d_sessionvars;
+
+    /** Array of cookie variables. */
+    protected $cookievars;
+    /** Array of cookie variables to be deleted. */
+    protected $d_sessionvars;
 
     /**
      * Instanciates an HTTP response.
@@ -179,15 +185,34 @@ class Response
      */
     public function getSession($varname, $default = false)
     {
-        if(isset($this->sessionvars[$varname])) {
+        if(isset($this->sessionvars[$varname])
+           && !in_array($this->d_sessionvars, $varname)) {
             return $this->sessionvars[$varname];
         } else {
-            return false;
+            return $default;
         }
     }
 
     /**
-     * Sets a SESSION variable.
+     * Clears a session variable.
+     * @param $varname is the session variable's name.
+     */
+    public function killSession($varname)
+    {
+        $this->d_sessionvars[] = $varname;
+    }
+
+    /**
+     * Clears a cookie variable.
+     * @param $varname is the cookie variable's name.
+     */
+    public function killCookie($varname)
+    {
+        $this->d_cookievars[] = $varname;
+    }
+
+    /**
+     * Sets a COOKIE variable.
      * @param varname is the variable's name.
      * @param varval is the value to assign to the variable.
      */
@@ -197,16 +222,17 @@ class Response
     }
 
     /**
-     * Retrieves the value of a session variable.
+     * Retrieves the value of a cookie variable.
      * @param $varname is the variable's name
      * @param $default is the default value to be returned.
      */
     public function getCookie($varname, $default = false)
     {
-        if(isset($this->cookievars[$varname])) {
+        if(isset($this->cookievars[$varname])
+           && !in_array($this->d_cookievars, $varname)) {
             return $this->cookievars[$varname];
         } else {
-            return false;
+            return $default;
         }
     }
 
@@ -304,6 +330,14 @@ class Response
         // Starting session first.
         if($this->use_session) {
             $_SESSION = array_merge($_SESSION, $this->sessionvars);
+
+            // Deleting
+            if(count($this->d_sessionvars) > 0) {
+                foreach($d_sessionvars as $var) {
+                    $_SESSION[$var] = null;
+                    unset($_SESSION[$var]);
+                }
+            }
         }
 
 		header('HTTP/1.1 ' . $this->httpStatus($this->getStatus()));
@@ -313,6 +347,14 @@ class Response
 		}
 
         $_COOKIE = array_merge($_COOKIE, $this->cookievars);
+
+        // Deleting
+        if(count($this->d_cookievars) > 0) {
+            foreach($d_cookievars as $var) {
+                $_COOKIE[$var] = null;
+                unset($_COOKIE[$var]);
+            }
+        }
 
 		echo $this->body;
 	}
