@@ -247,13 +247,8 @@ Modules are objects that extend the standard
 with standard methods that are called by hooks within Atlatl's
 core and can change its behaviour.
 
-_init($options)
-:   method called by the constructor. Overload this with custom code instead of the constructor.
-preRouting($path, $route, Request $request)
-:   method called before the routing algorithm is started.
-postRouting($path, $route, Request $request, Response $response)
-:   called after the routing was done.
-preView(Request $request, $path, $vars)
-:   called before displaying a view.
-postView(Request $request, $path, $vars)
-:   called after displaying a view.
+- _init($options) method called by the constructor. Overload this with custom code instead of the constructor.
+- preRouting($path, $route, Request $request) method called before the routing algorithm is started.
+- postRouting($path, $route, Request $request, Response $response) called after the routing was done.
+- preView(Request $request, $path, $vars) called before displaying a view.
+- postView(Request $request, $path, $vars) called after displaying a view.
