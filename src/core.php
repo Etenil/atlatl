@@ -184,10 +184,6 @@ class Core {
     function route(array $urls) {
         $path = $this->server->getRoute();
 
-        if($path == $this->prefix) {
-            $path.= '/'; // This is necessary to match '/' with a prefix.
-        }
-
 		// We revert-sort the keys to match more specific routes first.
         krsort($urls);
 
@@ -199,8 +195,8 @@ class Core {
         foreach($method_routes as $route) {
             $method = $this->server->getMethod() . ':';
             $clean_route = substr($route, strlen($method));
-            if(preg_match('%^'. $this->prefix . $clean_route .'/?$%i',
-                          $path, $matches)) {
+            if(preg_match('%^'. $clean_route .'/?$%i',
+                          $this->server->getRoute(), $matches)) {
                 $call = $urls[$route];
 				break;
             }
@@ -209,8 +205,8 @@ class Core {
         // Do we need to try generic routes?
         if(!$call) {
             foreach($urls as $regex => $proto) {
-                if(preg_match('%^'. $this->prefix . $regex .'/?$%i',
-                              $path, $matches)) {
+                if(preg_match('%^'. $regex .'/?$%i',
+                              $this->server->getRoute(), $matches)) {
                     $call = $proto;
 					break;
                 }
@@ -220,7 +216,7 @@ class Core {
 
         // If we don't have a call at this point, that's a 404.
         if(!$call) {
-            throw new NoRouteException("URL, $path, not found.");
+            throw new NoRouteException("URL, ".$this->server->getWholeRoute().", not found.");
         }
 
         /* We're accepting different types of handler declarations. It can be
