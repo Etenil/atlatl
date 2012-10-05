@@ -83,6 +83,12 @@ class Server
         $this->prefix = $prefix;
 	}
 
+    /** Gets the current route without prefix. */
+	public function getRoute()
+    {
+        return substr($this->route, strlen($this->prefix));
+    }
+
 	/**
 	 * Parses server variables into this class.
      * @param array $s is a server state array, like $_SERVER.
@@ -253,9 +259,9 @@ class Server
     /** Accessor for $time. */
 	public function getTime()
 		{ return $this->time; }
-    /** Accessor for $route. */
-	public function getRoute()
-	    { return $this->route; }
+    /** Gets the whole current route. */
+    public function getWholeRoute()
+        { return $this->route; }
     /** Accessor for $prefix. */
     public function getPrefix()
         { return $this->prefix; }
