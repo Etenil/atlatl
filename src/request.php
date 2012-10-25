@@ -72,6 +72,22 @@ class Request
 			return $default;
 		}
 	}
+
+    /**
+     * Retrieves all POST variables.
+     */
+    public function allPost()
+    {
+        return $this->postvars;
+    }
+
+    /**
+     * Retrieves all GET variables.
+     */
+    public function allGet()
+    {
+        return $this->getvars;
+    }
 }
 
 ?>
