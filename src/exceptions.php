@@ -75,28 +75,50 @@ class HTTPServerError extends HTTPStatus
 {}
 
 /**
+ * Error 404.
+ */
+class HTTPNotFoundError extends HTTPClientError
+{
+    function __construct()
+    {
+        parent::__construct(404, 'Not Found');
+    }
+}
+
+/**
+ * 500 error.
+ */
+class HTTPInternalServerError extends HTTPServerError
+{
+    function __construct()
+    {
+        parent::__construct(500, 'Server Error');
+    }
+}
+
+/**
  * Exception for a route that doesn't exist.
  */
-class NoRouteException extends HTTPClientError
+class NoRouteException extends HTTPNotFoundError
 {}
 
 /**
  * No handler to a route.
  */
-class NoHandlerException extends HTTPClientError
+class NoHandlerException extends HTTPInternalServerError
 {}
 
 /**
  * View doesn't exist, file not found.
  */
-class NoViewException extends HTTPClientError
+class NoViewException extends HTTPNotFoundError
 {}
 
 /**
  * The object returned by a controller cannot be converted to a
  * Response.
  */
-class IllegalResponseException extends HTTPServerError
+class IllegalResponseException extends HTTPInternalServerError
 {}
 
 /**
