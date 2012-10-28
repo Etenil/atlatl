@@ -23,10 +23,19 @@
 
 namespace atlatl;
 
+class HTTPStatus extends \Exception
+{
+    // Error code becomes mandatory and let's reorder them.
+    function __construct($status_code, $description)
+    {
+        parent::__construct($description, $status_code);
+    }
+}
+
 /**
  * Redirect (probably the most used exception).
  */
-class HttpRedirect extends \Exception
+class HttpRedirect extends HTTPStatus
 {
     /** The URL to redirect to. */
     protected $url;
@@ -35,8 +44,9 @@ class HttpRedirect extends \Exception
      * Redirects the visitor to some URL.
      * @param string $url is the URL to send the visitor to.
      */
-    public function __construct($url)
+    public function __construct($url, $code = 301)
     {
+        $this->code = $code;
         $this->url = $url;
     }
 
@@ -49,29 +59,44 @@ class HttpRedirect extends \Exception
     }
 }
 
+class HTTPSuccess extends HTTPStatus
+{}
+
+/**
+ * Client-side HTTP error.
+ */
+class HTTPClientError extends HTTPStatus
+{}
+
+/**
+ * Server-side HTTP error.
+ */
+class HTTPServerError extends HTTPStatus
+{}
+
 /**
  * Exception for a route that doesn't exist.
  */
-class NoRouteException extends \Exception
+class NoRouteException extends HTTPClientError
 {}
 
 /**
  * No handler to a route.
  */
-class NoHandlerException extends \Exception
+class NoHandlerException extends HTTPClientError
 {}
 
 /**
  * View doesn't exist, file not found.
  */
-class NoViewException extends \Exception
+class NoViewException extends HTTPClientError
 {}
 
 /**
  * The object returned by a controller cannot be converted to a
  * Response.
  */
-class IllegalResponseException extends \Exception
+class IllegalResponseException extends HTTPServerError
 {}
 
 /**

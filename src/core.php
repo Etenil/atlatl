@@ -35,10 +35,10 @@ class Core {
     /** Container of modules. */
 	protected $modules;
 
-    /** Callable variable that handles 404 errors. */
-    protected $error404;
-    /** Callable variable that handles 500 errors. */
-    protected $error500;
+    /** Callable variable that handles client errors. */
+    protected $error40x;
+    /** Callable variable that handles server errors. */
+    protected $error50x;
 
     /**
      * Class constructor.
@@ -68,11 +68,11 @@ class Core {
 			$this->request = new Request($_GET, $_POST, $_COOKIE);
 		}
 
-        $this->register404(function(\Exception $e) {
+        $this->register40x(function(\Exception $e) {
                 return new Response('404 Error - Page not found.', 404);
             });
 
-        $this->register500(function(\Exception $e) {
+        $this->register50x(function(\Exception $e) {
                 return new Response('500 Error - Server error.', 500);
             });
 
@@ -84,19 +84,19 @@ class Core {
      * @param callable $handler will be called in the event of a 404
      * error. This callable must accept one Exception parameter.
      */
-    public function register404($handler)
+    public function register40x($handler)
     {
-        $this->error404 = $handler;
+        $this->error40x = $handler;
     }
 
     /**
-     * Sets a new handler for 500 errors.
+     * Sets a new handler for 50x errors.
      * @param callable $handler will be called in the event of a 500
      * error. This callable must accept one Exception parameter.
      */
-    public function register500($handler)
+    public function register50x($handler)
     {
-        $this->error500 = $handler;
+        $this->error50x = $handler;
     }
 
     /**
@@ -157,14 +157,19 @@ class Core {
             $response = new Response();
             $response->setHeader('Location', $r->getUrl());
         }
-        catch(NoRouteException $e) {
-            $response = call_user_func($this->error404, $e);
+        catch(HTTPClientError $e) {
+            $response = call_user_func($this->error40x, $e);
         }
-        catch(NoViewException $e) {
-            $response = call_user_func($this->error404, $e);
+        catch(HTTPServerError $e) {
+            $response = call_user_func($this->error50x, $e);
         }
+        // Generic HTTP status response.
+        catch(HTTPStatus $s) {
+            $response = new Response($s->getMessage(), $s->getCode());
+        }
+        // Generic error.
         catch(\Exception $e) {
-            $response = call_user_func($this->error500, $e);
+            $response = call_user_func($this->error50x, $e);
         }
 
         $response->compile();
