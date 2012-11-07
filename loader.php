@@ -1,14 +1,14 @@
 <?php
 
-$srcdir = __DIR__ . '/src/';
+namespace atlatl;
 
-require_once($srcdir.'exceptions.php');
-require_once($srcdir.'security.php');
-require_once($srcdir.'server.php');
-require_once($srcdir.'request.php');
-require_once($srcdir.'response.php');
-require_once($srcdir.'modulecontainer.php');
-require_once($srcdir.'module.php');
-require_once($srcdir.'core.php');
+require_once('src/exceptions.php');
+require_once('src/security.php');
+require_once('src/server.php');
+require_once('src/request.php');
+require_once('src/response.php');
+require_once('src/modulecontainer.php');
+require_once('src/module.php');
+require_once('src/core.php');
 
 ?>
