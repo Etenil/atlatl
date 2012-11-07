@@ -88,6 +88,69 @@ class Request
     {
         return $this->getvars;
     }
+
+    /**
+     * Does the request contain files?
+     */
+    function hasFiles()
+    {
+        return (count($_FILES) > 0);
+    }
+
+    /**
+     * Gets an uploaded file.
+     */
+    function getFile($slot_name, $target, $exts = NULL)
+    {
+        if(!$target) {
+            throw \Exception("Can't move file without destination.");
+        }
+
+        if(!array_key_exists($slot_name, $_FILES)) {
+            return false;
+        }
+
+        $normalizeChars = array(
+            'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj','Ž'=>'Z', 'ž'=>'z', 'À'=>'A',
+            'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A',
+            'Ç'=>'C', 'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I',
+            'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O',
+            'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U', 'Ú'=>'U',
+            'Û'=>'U', 'Ü'=>'U', 'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss','à'=>'a',
+            'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a',
+            'ç'=>'c', 'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e', 'ì'=>'i',
+            'í'=>'i', 'î'=>'i', 'ï'=>'i', 'ð'=>'o', 'ñ'=>'n', 'ò'=>'o',
+            'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o', 'ù'=>'u',
+            'ú'=>'u', 'û'=>'u', 'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y',
+            'ƒ'=>'f',
+            );
+
+        if(preg_match("#/$#", $target) && is_dir($target)) {
+            $filename = basename($_FILES[$slot_name]['name']);
+            $target .= preg_replace('#[^a-zA-Z0-9._-]#', '_', strtr($filename, $normalizeChars));
+        }
+
+        if($exts != NULL && count($exts > 0)) {
+            $allowed = false;
+            foreach($exts as $ext) {
+                if(preg_match("#".$ext.'$#', $target)) {
+                    $allowed = true;
+                    break;
+                }
+            }
+
+            if(!$allowed) {
+                mvc_add_error(t("The uploaded file is not allowed."));
+                return false;
+            }
+        }
+
+        if(move_uploaded_file($_FILES[$slot_name]['tmp_name'], $target)) {
+            return $target;
+        } else {
+            return false;
+        }
+    }
 }
 
 ?>
