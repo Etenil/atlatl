@@ -125,9 +125,10 @@ class Request
             'ƒ'=>'f',
             );
 
-        if(preg_match("#/$#", $target) && is_dir($target)) {
+        if(is_dir($target)) {
             $filename = basename($_FILES[$slot_name]['name']);
-            $target .= preg_replace('#[^a-zA-Z0-9._-]#', '_', strtr($filename, $normalizeChars));
+            $filename = preg_replace('#[^a-zA-Z0-9._-]#', '_', strtr($filename, $normalizeChars));
+            $target = Utils::joinPath($target, $filename);
         }
 
         if($exts != NULL && count($exts > 0)) {
