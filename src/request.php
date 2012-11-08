@@ -128,7 +128,7 @@ class Request
         if(is_dir($target)) {
             $filename = basename($_FILES[$slot_name]['name']);
             $filename = preg_replace('#[^a-zA-Z0-9._-]#', '_', strtr($filename, $normalizeChars));
-            $target = Utils::joinPath($target, $filename);
+            $target = Utils::joinPaths($target, $filename);
         }
 
         if($exts != NULL && count($exts > 0)) {
@@ -145,6 +145,8 @@ class Request
                 return false;
             }
         }
+
+        var_dump($target); exit;
 
         if(move_uploaded_file($_FILES[$slot_name]['tmp_name'], $target)) {
             return $target;
