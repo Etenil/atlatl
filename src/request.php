@@ -141,12 +141,9 @@ class Request
             }
 
             if(!$allowed) {
-                mvc_add_error(t("The uploaded file is not allowed."));
-                return false;
+                throw new Exception("The uploaded file is not allowed.");
             }
         }
-
-        var_dump($target); exit;
 
         if(move_uploaded_file($_FILES[$slot_name]['tmp_name'], $target)) {
             return $target;
