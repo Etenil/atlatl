@@ -103,7 +103,7 @@ class Request
     function getFile($slot_name, $target, $exts = NULL)
     {
         if(!$target) {
-            throw \Exception("Can't move file without destination.");
+            throw new \Exception("Can't move file without destination.");
         }
 
         if(!array_key_exists($slot_name, $_FILES)) {
@@ -141,7 +141,7 @@ class Request
             }
 
             if(!$allowed) {
-                throw new Exception("The uploaded file is not allowed.");
+                throw new \Exception("The uploaded file is not allowed.");
             }
         }
 
