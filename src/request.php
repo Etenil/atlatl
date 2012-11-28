@@ -97,19 +97,8 @@ class Request
         return (count($_FILES) > 0);
     }
 
-    /**
-     * Gets an uploaded file.
-     */
-    function getFile($slot_name, $target, $exts = NULL)
+    function _getAndMoveFile($file, $target, $exts = null)
     {
-        if(!$target) {
-            throw new \Exception("Can't move file without destination.");
-        }
-
-        if(!array_key_exists($slot_name, $_FILES)) {
-            return false;
-        }
-
         $normalizeChars = array(
             'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj','Ž'=>'Z', 'ž'=>'z', 'À'=>'A',
             'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A',
@@ -125,10 +114,12 @@ class Request
             'ƒ'=>'f',
             );
 
-        if(is_dir($target)) {
-            $filename = basename($_FILES[$slot_name]['name']);
-            $filename = preg_replace('#[^a-zA-Z0-9._-]#', '_', strtr($filename, $normalizeChars));
-            $target = Utils::joinPaths($target, $filename);
+        {
+            $target_filename = basename($target);
+            $target_dir = dirname($target);
+            $target = Utils::joinPaths($target_dir, preg_replace('#[^a-zA-Z0-9._-]#', '_',
+                                                                 strtr($target_filename,
+                                                                       $normalizeChars)));
         }
 
         if($exts != NULL && count($exts > 0)) {
@@ -145,11 +136,53 @@ class Request
             }
         }
 
-        if(move_uploaded_file($_FILES[$slot_name]['tmp_name'], $target)) {
+        if(move_uploaded_file($file['tmp_name'], $target)) {
             return $target;
         } else {
             return false;
         }
+    }
+
+    /**
+     * Gets an uploaded file.
+     */
+    function getFile($slot_name, $target, $exts = NULL)
+    {
+        if(!$target) {
+            throw new \Exception("Can't move file without destination.");
+        }
+
+        if(!array_key_exists($slot_name, $_FILES)) {
+            return false;
+        }
+
+        $return = false;
+
+        // Several files uploaded with the same name like uploads[].
+        if(is_array($_FILES[$slot_name]['name'])) {
+            if(!is_dir($target)) {
+                throw new Exception("Target `$target' must be a directory for several files.");
+            }
+
+            $return = array();
+            for($file_num = 0; $file_num < count($_FILES[$slot_name]['name']); $file_num++) {
+                $file = array(
+                    'name' => $_FILES[$slot_name]['name'][$file_num],
+                    'type' => $_FILES[$slot_name]['type'][$file_num],
+                    'tmp_name' => $_FILES[$slot_name]['tmp_name'][$file_num],
+                    'error' => $_FILES[$slot_name]['error'][$file_num],
+                    'size' => $_FILES[$slot_name]['size'][$file_num]
+                    );
+                $return[] = $this->_getAndMoveFile($file, Utils::joinPaths($target, basename($file['name'])), $exts);
+            }
+        } else {
+            if(is_dir($target)) {
+                $target = Utils::joinPaths($target, basename($_FILES[$slot_name]['name']));
+            }
+            $return = $this->_getAndMoveFile($_FILES[$slot_name], $target, $exts);
+        }
+
+        return $return;
     }
 }
 
