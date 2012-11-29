@@ -190,7 +190,7 @@ class Server
             $siteurl.= ':' . $this->getPort();
         }
 
-        $siteurl.= $this->getPrefix() . '/' . $url;
+        $siteurl = Utils::joinPaths($siteurl, $this->getPrefix(), $url);
 
         return $siteurl;
     }
