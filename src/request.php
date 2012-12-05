@@ -58,6 +58,20 @@ class Request
 		}
 	}
 
+    /**
+     * Returns a string with all GET parameters as they appear in the URL.
+     */
+    public function getToString()
+    {
+        $get = $this->allGet();
+        $formatted = array();
+        foreach($get as $name => $val) {
+            $formatted[] = "$name=$val";
+        }
+
+        return implode('&', $formatted);
+    }
+
 	/**
 	 * Retrieves a POST variable.
 	 * @param string    $varname         The variable to fetch.
