@@ -15,12 +15,14 @@ class Utils
     {
         $abspath = $path1[0] == '/';
 
+        $paths = array_filter(func_get_args());
+
         $paths = array_map(function($path) {
                 $path = preg_replace('%^/%', '', $path);
                 $path = preg_replace('%/$%', '', $path);
                 return $path;
             },
-            func_get_args());
+            $paths);
 
         $path = implode('/', $paths);
 
