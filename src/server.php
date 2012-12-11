@@ -97,7 +97,7 @@ class Server
 	{
 		$this->method      = strtoupper($this->arrayGet('REQUEST_METHOD', $s));
 		$this->host        = $this->arrayGet('HTTP_HOST', $s);
-		$this->user_agent  = $this->arrayGet('HTTP_USER_AGENT', $s);
+		$this->user_agent  = $this->arrayGet('HTTP_USER_AGENT', $s, false, false);
 		$this->accept      = $this->arrayGet('HTTP_ACCEPT', $s, true);
 		$this->languages   = $this->arrayGet('HTTP_ACCEPT_LANGUAGE', $s, true);
 		$this->encodings   = $this->arrayGet('HTTP_ACCEPT_ENCODING', $s, true);
@@ -141,15 +141,23 @@ class Server
      * requested $key. If $key doesn't exist in $array, then FALSE is
      * returned.
      */
-    protected function arrayGet($key, array $array, $split = false)
+    protected function arrayGet($key, array $array, $split = false, $clean = true)
     {
         if(isset($array[$key])) {
 			if($split) {
-				$data = explode(',', $this->clean($array[$key]));
+                if($clean) {
+                    $data = explode(',', $this->clean($array[$key]));
+                } else {
+                    $data = explode(',', $array[$key]);
+                }
 				$data = array_map(function($item) { return trim($item); }, $data);
 				return $data;
 			} else {
-				return $this->clean($array[$key]);
+                if($clean) {
+                    return $this->clean($array[$key]);
+                } else {
+                    return $array[$key];
+                }
 			}
         } else {
             return false;
