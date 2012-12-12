@@ -38,7 +38,7 @@ class Utils
      * @param $filename is the original filename.
      * @return the cleaned-up filename.
      */
-    public static function cleanFilename($filename)
+    public static function cleanFilename($filename, $placeholder='_')
     {
         $normalizeChars = array(
             'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj','Ž'=>'Z', 'ž'=>'z', 'À'=>'A',
@@ -55,7 +55,7 @@ class Utils
             'ƒ'=>'f',
             );
 
-        return preg_replace('#[^a-zA-Z0-9._-]#', '_',
+        return preg_replace('#[^a-zA-Z0-9._-]#', $placeholder,
                             strtr($filename,
                                   $normalizeChars));
     }
