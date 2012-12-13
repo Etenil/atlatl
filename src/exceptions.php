@@ -35,7 +35,7 @@ class HTTPStatus extends \Exception
 /**
  * Redirect (probably the most used exception).
  */
-class HttpRedirect extends HTTPStatus
+class HTTPRedirect extends HTTPStatus
 {
     /** The URL to redirect to. */
     protected $url;
