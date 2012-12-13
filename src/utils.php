@@ -38,8 +38,12 @@ class Utils
      * @param $filename is the original filename.
      * @return the cleaned-up filename.
      */
-    public static function cleanFilename($filename, $placeholder='_')
+    public static function cleanFilename($filename, $placeholder='_', $convert_html = true)
     {
+        if($convert_html) {
+            $filename = html_entity_decode($filename);
+        }
+        
         $normalizeChars = array(
             'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj','Ž'=>'Z', 'ž'=>'z', 'À'=>'A',
             'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A',
