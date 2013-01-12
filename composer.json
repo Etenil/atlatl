@@ -1,5 +1,5 @@
 {
-	"name": "etenil/atlatl"
+	"name": "etenil/atlatl",
 	"description": "A tiny and very simple micro-framework",
     "keywords": ["framework", "micro", "gluephp"],
     "homepage": "http://pikacode.com/etenil/atlatl",
@@ -14,8 +14,8 @@
     ],
 	"require": {
 		"php": ">=5.3.0"
+	},
+	"autoload": {
+	    "classmap": ["src/"]
 	}
-    "autoload": {
-        "files": ["loader.php"]
-    }
 }
