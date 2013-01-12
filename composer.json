@@ -1,3 +1,18 @@
 {
 	"name": "etenil/atlatl"
+	"description": "A tiny and very simple micro-framework",
+    "keywords": ["framework", "micro", "gluephp"],
+    "homepage": "http://pikacode.com/etenil/atlatl",
+    "type": "library",
+    "license": "GPL-3.0+",
+    "authors": [
+        {
+            "name": "Guillaume 'Etenil' Pasquet",
+            "email": "boss@etenil.net",
+            "homepage": "http://blog.etenil.net"
+        }
+    ],
+	"require": {
+		"php": ">=5.3.0"
+	}
 }
