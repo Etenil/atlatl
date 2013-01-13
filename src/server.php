@@ -88,9 +88,12 @@ class Server
     {
         $route = substr($this->route, strlen($this->prefix));
         // Stripping final '/'.
-        if($route[strlen($route) - 1] == '/') {
+        if(strlen($route) > 1
+           && $route[strlen($route) - 1] == '/') {
             $route = substr($route, 0, strlen($route) - 1);
         }
+
+        return $route;
     }
 
 	/**
