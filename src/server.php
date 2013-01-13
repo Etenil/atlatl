@@ -86,7 +86,11 @@ class Server
     /** Gets the current route without prefix. */
 	public function getRoute()
     {
-        return substr($this->route, strlen($this->prefix));
+        $route = substr($this->route, strlen($this->prefix));
+        // Stripping final '/'.
+        if($route[strlen($route) - 1] == '/') {
+            $route = substr($route, 0, strlen($route) - 1);
+        }
     }
 
 	/**

@@ -172,7 +172,11 @@ class Core {
             $response = call_user_func($this->error50x, $e);
         }
 
-        $response->compile();
+        if(is_object($response)) {
+            $response->compile();
+        } else {
+            echo $response;
+        }
 	}
 
     /**
