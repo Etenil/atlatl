@@ -1,8 +1,6 @@
 <?php
 
-require_once(dirname(__DIR__) . '/server.php');
-
-class TestServer extends PHPUnit_Framework_TestCase
+class ServerTest extends PHPUnit_Framework_TestCase
 {
 	function testParse()
 	{

@@ -2,6 +2,7 @@
 
 namespace atlatl;
 
+require_once('src/injector.php');
 require_once('src/utils.php');
 require_once('src/exceptions.php');
 require_once('src/security.php');

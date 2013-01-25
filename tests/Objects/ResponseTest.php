@@ -1,8 +1,6 @@
 <?php
 
-require_once(dirname(__DIR__) . '/response.php');
-
-class TestResponse extends PHPUnit_Framework_TestCase
+class ResponseTest extends PHPUnit_Framework_TestCase
 {
     function testBody()
     {

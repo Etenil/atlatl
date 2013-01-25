@@ -59,8 +59,7 @@ class Response
      */
 	public function __construct($body = '', $status_code = 200,
 								$content_type = 'text/html; charset=UTF-8',
-                                array $cookies = null,
-                                array $session = null)
+                                array $cookies, array $session)
 	{
 		$this->status_code = $status_code;
 		$this->content_type = $content_type;
@@ -70,23 +69,12 @@ class Response
         $this->d_sessionvars = array();
         $this->d_cookievars = array();
 
-        // PHP 5.4+ only.
-        if(function_exists('session_status') && session_status() == PHP_SESSION_ACTIVE) {
-            $this->use_session = true;
-        }
-        else if(isset($_SESSION)) {
+        if($session) { // array not empty.
+            $this->session = $session;
             $this->use_session = true;
         }
 
-        if($this->use_session) {
-            $this->sessionvars = $_SESSION;
-        }
-
-        if($cookies) {
-            $this->cookievars = $cookies;
-        } else {
-            $this->cookievars = $_COOKIE;
-        }
+        $this->cookievars = $cookies;
 	}
 
     /**

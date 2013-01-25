@@ -1,8 +1,6 @@
 <?php
 
-require_once(dirname(__DIR__) . '/request.php');
-
-class TestRequest extends PHPUnit_Framework_TestCase
+class RequestTest extends PHPUnit_Framework_TestCase
 {
     function testGet()
     {

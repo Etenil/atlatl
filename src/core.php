@@ -26,8 +26,6 @@ namespace atlatl;
  * along with Atlatl.  If not, see <http://www.gnu.org/licenses/>.
  */
 class Core {
-    /** URL prefix. */
-    protected $prefix = "";
     /** Server object. */
 	protected $server;
     /** Request being handled. */
@@ -47,36 +45,38 @@ class Core {
      * @param Request $request is the HTTP Request to handle. Default
      * is generated from superglobals.
      */
-    public function __construct($prefix = "", Server $server = null, Request $request = null)
+    public function __construct($prefix = "", Server $server = null, Request $request = null, ModuleContainer $mc = null)
     {
-		if($server) {
-			$this->server = $server;
-		} else {
-			$this->server = new Server($_SERVER, $prefix);
-		}
+        if($server) {
+            $this->server = $server;
+        } else { // Backwards-compatibility
+            $this->server = Injector::give('Server', $_SERVER);
+        }
 
-        if(!$prefix) {
-            $this->setPrefix($server->getPrefix());
-        } else {
-            $this->setPrefix($prefix);
+        // Just some syntactic sugar to avoid initialising the Server object.
+        if($prefix) {
             $this->server->setPrefix($prefix);
         }
 
-		if($request) {
-			$this->resquet = $request;
-		} else {
-			$this->request = new Request($_GET, $_POST, $_COOKIE);
-		}
+        if($request) {
+            $this->request = $request;
+        } else { // Backwards-compatibility
+            $this->request = Injector::give('Request', $_GET, $_POST);
+        }
 
         $this->register40x(function(\Exception $e) {
-                return new Response('404 Error - Page not found.', 404);
+                return Injector::give('Response', '404 Error - Page not found.', 404);
             });
 
         $this->register50x(function(\Exception $e) {
-                return new Response('500 Error - Server error.', 500);
+                return Injector::give('Response', '500 Error - Server error.', 500);
             });
 
-		$this->modules = new ModuleContainer($this->server);
+        if($mc) {
+            $this->modules = $mc;
+        } else { // Backwards-compatibility again...
+            $this->modules = Injector::give('ModuleContainer', $this->server);
+        }
     }
 
     /**
@@ -154,7 +154,7 @@ class Core {
             $response = $this->route($urls);
         }
         catch(HttpRedirect $r) {
-            $response = new Response();
+            $response = Injector::give('Response');
             $response->setHeader('Location', $r->getUrl());
         }
         catch(HTTPClientError $e) {
@@ -165,7 +165,7 @@ class Core {
         }
         // Generic HTTP status response.
         catch(HTTPStatus $s) {
-            $response = new Response($s->getMessage(), $s->getCode());
+            $response = Injector::give('Response', $s->getMessage(), $s->getCode());
         }
         // Generic error.
         catch(\Exception $e) {
@@ -249,11 +249,12 @@ class Core {
 
         if(!$class) { // Just a function call (or a closure?). Less hooks obviously.
             // Mounting system stuff into an object and generating the parameters.
-            $params = array_merge(array((object)array('modules' => $this->modules,
-                                                      'server'  => $this->server,
-                                                      'request' => $this->request,
-                                                      'sec'     => new Security())),
-                                        array_slice($matches, 1));
+            $params = array_merge(array((object)array(
+                              'modules' => $this->modules,
+                              'server'  => $this->server,
+                              'request' => $this->request,
+                              'sec'     => Injector::give('Security'))),
+                      array_slice($matches, 1));
             $response = call_user_func_array($method, $params);
         }
         else if(class_exists($class)) {
@@ -277,10 +278,10 @@ class Core {
 
         // Cleaning up the response...
         if(gettype($response) == 'string') {
-            $response = new Response($response);
+            $response = Injector::give('Response', $response);
         }
         else if($response === null) {
-            $response = new Response();
+            $response = Injector::give('Response');
         }
         else if(gettype($response) != 'object'
                 || (gettype($response) == 'object'

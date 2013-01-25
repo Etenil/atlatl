@@ -1,8 +1,5 @@
 <?php
 
-require_once(dirname(__DIR__) . '/module.php');
-require_once(dirname(__DIR__) . '/modulecontainer.php');
-
 class MyModule extends atlatl\Module
 {
     function cook()
@@ -10,11 +7,11 @@ class MyModule extends atlatl\Module
     }
 }
 
-class TestModuleContainer extends PHPUnit_Framework_TestCase
+class ModuleContainerTest extends PHPUnit_Framework_TestCase
 {
     function testPopulate()
     {
-        $mod1 = $this->getMock('MyModule');
+        $mod1 = $this->getMock('\\atlatl\\Module');
         $mod1->expects($this->once())->method('cook');
 
         $mod2 = $this->getMock('MyModule');
