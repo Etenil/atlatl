@@ -37,6 +37,12 @@ Injector::register('Response',
                 || isset($_SESSION)) {
                 $session = $_SESSION;
             }
+            else if(session_id() && isset($_SESSION)) {
+                $session = $_SESSION;
+            }
+            else {
+                $session = array();
+            }
         }
 
         if(!$cookies) {
