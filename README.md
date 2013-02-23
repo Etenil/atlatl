@@ -1,5 +1,5 @@
 Atlatl
-====
+======
 Author: Guillaume Pasquet (aka Etenil) <boss@etenil.net>
 
 Atlatl is a fast and modular MVC framework for PHP
@@ -25,20 +25,16 @@ Here is an example of how to use atlatl:
 
 	$app = new atlatl\Core('/atlatl/test.php');
 
-    class TestModule extends atlatl\Module
-	{
+    class TestModule extends atlatl\Module {
 		protected $name;
 		
-		function hello()
-		{
+		function hello() {
 			return "Hello ".$this->name."!";
 		}
 	}
 
-	class TestController extends atlatl\Controller
-	{
-		function test()
-		{
+	class TestController extends atlatl\Controller {
+		function test() {
 			echo $this->modules->TestModule->hello();
 		}
 	}
@@ -46,6 +42,13 @@ Here is an example of how to use atlatl:
 	$app->loadModule('TestModule', array('name' => 'Guillaume'));
 	$app->serve(array('/' => 'TestController::test'));
 
+First we are creating a new **Atlatl** app. An important thing to notice here is the prefix that we pass on to the application. This prefix is the part of URL that sits between the domain name and the framework's location. In the example, the framework sits at a URL like so: **http://somewhere.com/atlatl/test.php/**.
+
+Then we create a new module that will return a greeting with a name. The controller will handle the requests and inherit the loaded modules from the app.
+
+Finally we set up the routes and serve.
+
+For more information, refer to the **MANUAL.md** file.
 
 Credits
 =======

@@ -11,6 +11,7 @@ require_once('src/request.php');
 require_once('src/response.php');
 require_once('src/modulecontainer.php');
 require_once('src/module.php');
+require_once('src/controller.php');
 require_once('src/core.php');
 
 ?>
