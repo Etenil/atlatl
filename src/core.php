@@ -106,7 +106,7 @@ class Core {
     public function php_error_handler($errno, $errstr, $errfile, $errline)
     {
         $e = new \Exception($errstr, $errno);
-        $this->error50x($e);
+        call_user_func($this->error50x, $e);
     }
 
     /**
@@ -114,12 +114,10 @@ class Core {
      */
     public function php_fatal_error_handler()
     {
-        $errno = E_CORE_ERROR;
-        $errstr = error_get_last();
-
-        if($errstr !== NULL) {
-            $e = new \Exception($errstr, $errno);
-            $this->error50x($e);
+        $error = error_get_last();
+        if($error !== NULL) {
+            $e = new \Exception($error['message'], $error['type']);
+            call_user_func($this->error50x, $e);
         }
     }
 
@@ -175,7 +173,7 @@ class Core {
         $response = null;
 
         // Registering PHP error handlers.
-        set_error_handler(array($this, 'php_error_handler'));
+        set_error_handler(array($this, 'php_error_handler'), E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR);
         register_shutdown_function(array($this, 'php_fatal_error_handler'));
 
         try {
