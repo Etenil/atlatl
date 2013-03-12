@@ -100,6 +100,30 @@ class Core {
     }
 
     /**
+     * Wrapper that converts PHP errors to exceptions and passes them
+     * to the standard error50x handler.
+     */
+    public function php_error_handler($errno, $errstr, $errfile, $errline)
+    {
+        $e = new \Exception($errstr, $errno);
+        $this->error50x($e);
+    }
+
+    /**
+     * Handler for PHP fatal errors.
+     */
+    public function php_fatal_error_handler()
+    {
+        $errno = E_CORE_ERROR;
+        $errstr = error_get_last();
+
+        if($errstr !== NULL) {
+            $e = new \Exception($errstr, $errno);
+            $this->error50x($e);
+        }
+    }
+
+    /**
      * Instanciates a new module and adds it to the collection.
      * @param string $module is the module's name.
      * @param array $options is an array of options passed to the
@@ -149,6 +173,10 @@ class Core {
 	function serve(array $urls)
 	{
         $response = null;
+
+        // Registering PHP error handlers.
+        set_error_handler(array($this, 'php_error_handler'));
+        register_shutdown_function(array($this, 'php_fatal_error_handler'));
 
         try {
             $response = $this->route($urls);
