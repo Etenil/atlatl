@@ -1,8 +1,8 @@
 ATLATL
 ======
 
-VERSION 0.1
-UPDATED 29 May 2012
+VERSION 1.0
+UPDATED 13 Mar 2013
 
 
 Introduction
