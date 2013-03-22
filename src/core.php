@@ -219,9 +219,6 @@ class Core {
     function route(array $urls) {
         $path = $this->server->getRoute();
 
-		// We revert-sort the keys to match more specific routes first.
-        krsort($urls);
-
         $call = false;        // This will store the controller and method to call
         $matches = array();   // And this the extracted parameters.
 
