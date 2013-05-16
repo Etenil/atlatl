@@ -201,7 +201,7 @@ class Server
         //$siteurl = $this->getProtocol() . '://' . $this->getHost();
         $siteurl = 'http://' . $this->getHost();
 
-        if($this->getPort() != 80) {
+        if($this->getPort() != 80 && !strpos($this->getHost(), ':')) {
             $siteurl.= ':' . $this->getPort();
         }
 
