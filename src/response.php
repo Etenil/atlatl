@@ -69,7 +69,7 @@ class Response
         $this->d_sessionvars = array();
         $this->d_cookievars = array();
 
-        if($session) { // array not empty.
+        if(is_array($session)) { // array not empty.
             $this->session = $session;
             $this->use_session = true;
         }
@@ -319,7 +319,7 @@ class Response
 	{
         // Starting session first.
         if($this->use_session) {
-            $_SESSION = array_merge($_SESSION, $this->sessionvars);
+            $_SESSION = @array_merge($_SESSION, $this->sessionvars);
 
             // Deleting
             if(count($this->d_sessionvars) > 0) {
