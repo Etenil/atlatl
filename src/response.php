@@ -70,7 +70,7 @@ class Response
         $this->d_cookievars = array();
 
         if(is_array($session)) { // array not empty.
-            $this->session = $session;
+            $this->sessionvars = $session;
             $this->use_session = true;
         }
 
