@@ -319,7 +319,7 @@ class Response
 	{
         // Starting session first.
         if($this->use_session) {
-            $_SESSION = array_merge($_SESSION, $this->sessionvars);
+            $_SESSION = @array_merge($_SESSION, $this->sessionvars);
 
             // Deleting
             if(count($this->d_sessionvars) > 0) {
