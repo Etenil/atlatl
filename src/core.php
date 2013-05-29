@@ -110,18 +110,6 @@ class Core {
     }
 
     /**
-     * Handler for PHP fatal errors.
-     */
-    public function php_fatal_error_handler()
-    {
-        $error = error_get_last();
-        if($error !== NULL) {
-            $e = new \Exception($error['message'], $error['type']);
-            call_user_func($this->error50x, $e);
-        }
-    }
-
-    /**
      * Instanciates a new module and adds it to the collection.
      * @param string $module is the module's name.
      * @param array $options is an array of options passed to the
@@ -174,7 +162,6 @@ class Core {
 
         // Registering PHP error handlers.
         set_error_handler(array($this, 'php_error_handler'), E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR);
-        register_shutdown_function(array($this, 'php_fatal_error_handler'));
 
         try {
             $response = $this->route($urls);
