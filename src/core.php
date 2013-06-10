@@ -164,7 +164,9 @@ class Core {
         set_error_handler(array($this, 'php_error_handler'), E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR);
 
         try {
-            $response = $this->route($urls);
+            $handler = $this->route($urls);
+            $response = $this->process($handler);
+            $this->display($response);
         }
         catch(HttpRedirect $r) {
             $response = Injector::give('Response');
@@ -184,13 +186,18 @@ class Core {
         catch(\Exception $e) {
             $response = call_user_func($this->error50x, $e);
         }
+	}
 
+    /**
+     * Processes the returned object from a handler.
+     */
+    protected function display($response) {
         if(is_object($response)) {
             $response->compile();
         } else {
             echo $response;
         }
-	}
+    }
 
     /**
      * Does the actual URL routing.
@@ -203,7 +210,7 @@ class Core {
      * @throws  BadMethodCallException  Thrown if a corresponding GET,POST is not found
      *
      */
-    function route(array $urls) {
+    protected function route(array $urls) {
         $path = $this->server->getRoute();
 
         $call = false;        // This will store the controller and method to call
@@ -238,11 +245,20 @@ class Core {
             throw new NoRouteException("URL, ".$this->server->getWholeRoute().", not found.");
         }
 
+        return array('call' => $call, 'params' => $matches);
+    }
+
+    /**
+     * Processes a route call, something like `stuff::thing' or just a function name
+     * or even a closure.
+     */
+    protected function process($proto) {
         /* We're accepting different types of handler declarations. It can be
          * anything PHP defines as a 'callable', or in the form class::method. */
         $class = '';
         $method = '';
-
+        $call = $proto['call'];
+        $matches = $proto['params'];
 
         if(is_string($call) && preg_match('/^.+::.+$/', trim($call))) {
             list($class, $method) = explode('::', $call);
