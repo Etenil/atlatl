@@ -32,18 +32,11 @@ class Response
     /** Content type header. */
 	protected $content_type;
 
-    /** Has the session been started? */
-    protected $use_session;
-
-    /** Array of session variables. */
+    // TODO: Deprecate those two vars.
     protected $sessionvars;
-    /** Array of session variables to be deleted. */
-    protected $d_sessionvars;
-
-    /** Array of cookie variables. */
     protected $cookievars;
-    /** Array of cookie variables to be deleted. */
-    protected $d_cookievars;
+    protected $alteredsession = false;
+    protected $alteredcookies = false;
 
     /**
      * Instanciates an HTTP response.
@@ -59,22 +52,15 @@ class Response
      */
 	public function __construct($body = '', $status_code = 200,
 								$content_type = 'text/html; charset=UTF-8',
-                                array $cookies, array $session)
+                                array $cookies = null, array $session = null)
 	{
 		$this->status_code = $status_code;
 		$this->content_type = $content_type;
 		$this->headers = array();
 		$this->body = $body;
-        $this->use_session = false;
-        $this->d_sessionvars = array();
-        $this->d_cookievars = array();
 
-        if(is_array($session)) { // array not empty.
-            $this->sessionvars = $session;
-            $this->use_session = true;
-        }
-
-        $this->cookievars = $cookies;
+        $this->sessionvars = $session ?: array();
+        $this->cookievars = $cookies ?: array();
 	}
 
     /**
@@ -159,12 +145,9 @@ class Response
      */
     public function setSession($varname, $varval)
     {
-        if($this->use_session) {
-            $this->sessionvars[$varname] = $varval;
-            return $this;
-        } else {
-            return false;
-        }
+        $this->alteredsession = true;
+        $this->sessionvars[$varname] = $varval;
+        return $this;
     }
 
     /**
@@ -175,8 +158,7 @@ class Response
      */
     public function getSession($varname, $default = false)
     {
-        if(isset($this->sessionvars[$varname])
-           && !in_array($varname, $this->d_sessionvars)) {
+        if(isset($this->sessionvars[$varname])) {
             return $this->sessionvars[$varname];
         } else {
             return $default;
@@ -189,7 +171,17 @@ class Response
      */
     public function killSession($varname)
     {
-        $this->d_sessionvars[] = $varname;
+        $this->alteredsession = true;
+        unset($this->sessionvars[$varname]);
+        return $this;
+    }
+
+    public function alteredSession() {
+        return $this->alteredsession;
+    }
+
+    public function alteredCookies() {
+        return $this->alteredcookies;
     }
 
     /**
@@ -198,7 +190,9 @@ class Response
      */
     public function killCookie($varname)
     {
-        $this->d_cookievars[] = $varname;
+        $this->alteredcookies = true;
+        unset($this->cookievars[$varname]);
+        return $this;
     }
 
     /**
@@ -208,6 +202,7 @@ class Response
      */
     public function setCookie($varname, $varval)
     {
+        $this->alteredcookies = true;
         $this->cookievars[$varname] = $varval;
     }
 
@@ -218,21 +213,11 @@ class Response
      */
     public function getCookie($varname, $default = false)
     {
-        if(isset($this->cookievars[$varname])
-           && !in_array($varname, $this->d_cookievars)) {
+        if(isset($this->cookievars[$varname])) {
             return $this->cookievars[$varname];
         } else {
             return $default;
         }
-    }
-
-    /**
-     * Has a session been started?
-     * @return boolean TRUE if a session was started.
-     */
-    public function hasSession()
-    {
-        return $this->use_session;
     }
 
     /**
@@ -245,6 +230,20 @@ class Response
             $this->status_code = $statuscode;
         }
         return $this;
+    }
+
+    /**
+     * Gets all cookies.
+     */
+    function getAllCookies() {
+        return $this->cookievars;
+    }
+
+    /**
+     * Gets all session.
+     */
+    function getAllSession() {
+        return $this->sessionvars;
     }
 
     /**
@@ -318,20 +317,10 @@ class Response
 	public function compile()
 	{
         // Starting session first.
-        if($this->use_session) {
-            if(!is_array($this->sessionvars)) {
-                $this->sessionvars = array();
-            }
-            $_SESSION = array_merge($_SESSION, $this->sessionvars);
-
-            // Deleting
-            if(count($this->d_sessionvars) > 0) {
-                foreach($this->d_sessionvars as $var) {
-                    $_SESSION[$var] = null;
-                    unset($_SESSION[$var]);
-                }
-            }
+        if(!is_array($this->sessionvars)) {
+            $this->sessionvars = array();
         }
+        $_SESSION = @array_merge($_SESSION, $this->sessionvars);
 
 		header('HTTP/1.1 ' . $this->httpStatus($this->getStatus()));
 		header('Content-Type: ' . $this->content_type);
@@ -339,15 +328,7 @@ class Response
 			header($hdrkey . ': ' . $hdrval);
 		}
 
-        $_COOKIE = array_merge($_COOKIE, $this->cookievars);
-
-        // Deleting
-        if(count($this->d_cookievars) > 0) {
-            foreach($this->d_cookievars as $var) {
-                $_COOKIE[$var] = null;
-                unset($_COOKIE[$var]);
-            }
-        }
+        $_COOKIE = @array_merge($_COOKIE, $this->cookievars);
 
 		echo $this->body;
 	}

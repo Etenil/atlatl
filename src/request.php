@@ -31,16 +31,22 @@ class Request
 	protected $getvars;
     /** Stores the POST variables. */
 	protected $postvars;
+    /** Stores Session vars. */
+    protected $sessionvars;
+    /** Stores Cookie vars. */
+    protected $cookievars;
 
 	/**
 	 * Constructor, loads up GET and POST variables.
 	 * @param array    $get        $_GET array.
 	 * @param array    $post       $_POST array.
 	 */
-	public function __construct(array $get, array $post)
+	public function __construct(array $get, array $post, array $session, array $cookies)
 	{
 		$this->getvars = $get;
 		$this->postvars = $post;
+        $this->sessionvars = $session;
+        $this->cookievars = $cookies;
 	}
 
 	/**
@@ -101,6 +107,85 @@ class Request
     public function allGet()
     {
         return $this->getvars;
+    }
+
+    /**
+     * Sets a SESSION variable.
+     * @param varname is the variable's name.
+     * @param varval is the value to assign to the variable.
+     * @return FALSE if session isn't started.
+     */
+    public function setSession($varname, $varval)
+    {
+        $this->sessionvars[$varname] = $varval;
+        return $this;
+    }
+
+    /**
+     * Retrieves the value of a session variable.
+     * @param $varname is the variable's name
+     * @param $default is the default value to be returned.
+     * @return the session variable or FALSE if it can't be retrieved.
+     */
+    public function getSession($varname, $default = false)
+    {
+        if(isset($this->sessionvars[$varname])) {
+            return $this->sessionvars[$varname];
+        } else {
+            return $default;
+        }
+    }
+
+    /**
+     * Clears a session variable.
+     * @param $varname is the session variable's name.
+     */
+    public function killSession($varname)
+    {
+        unset($this->sessionvars[$varname]);
+        return $this;
+    }
+
+    public function setAllSession(array $session) {
+        $this->sessionvars = $session;
+    }
+
+    public function setAllCookies(array $cookies) {
+        $this->cookievars = $cookies;
+    }
+
+    /**
+     * Clears a cookie variable.
+     * @param $varname is the cookie variable's name.
+     */
+    public function killCookie($varname)
+    {
+        unset($this->cookievars[$varname]);
+        return $this;
+    }
+
+    /**
+     * Sets a COOKIE variable.
+     * @param varname is the variable's name.
+     * @param varval is the value to assign to the variable.
+     */
+    public function setCookie($varname, $varval)
+    {
+        $this->cookievars[$varname] = $varval;
+    }
+
+    /**
+     * Retrieves the value of a cookie variable.
+     * @param $varname is the variable's name
+     * @param $default is the default value to be returned.
+     */
+    public function getCookie($varname, $default = false)
+    {
+        if(isset($this->cookievars[$varname])) {
+            return $this->cookievars[$varname];
+        } else {
+            return $default;
+        }
     }
 
     /**
@@ -210,6 +295,10 @@ class Request
 
         return $return;
     }
+
+    function commitSessionAndCookies() {
+        $_SESSION = $this->sessionvars;
+        $_COOKIE = $this->cookievars;
+    }
 }
 
-?>

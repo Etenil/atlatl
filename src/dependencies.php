@@ -16,8 +16,8 @@ Injector::register('Server', function(array $data, $prefix = '') {
     });
 
 // Request
-Injector::register('Request', function(array $get, array $post) {
-        return new Request($get, $post);
+Injector::register('Request', function(array $get, array $post, array $session = null, array $cookies = null) {
+        return new Request($get, $post, $session ?: array(), $cookies ?: array());
     });
 
 // ModuleContainer
@@ -28,28 +28,8 @@ Injector::register('ModuleContainer', function(Server $server) {
 // Response
 Injector::register('Response',
     function($body = '', $status_code = 200,
-        $content_type = 'text/html; charset=UTF-8',
-        array $cookies = null, array $session = null) {
-        if(!$session) {
-            // PHP 5.4+ first.
-            if((function_exists('session_status')
-                    && session_status() == PHP_SESSION_ACTIVE)
-                || isset($_SESSION)) {
-                $session = $_SESSION;
-            }
-            else if(session_id() && isset($_SESSION)) {
-                $session = $_SESSION;
-            }
-            else {
-                $session = array();
-            }
-        }
-
-        if(!$cookies) {
-            $cookies = $_COOKIE;
-        }
-
-        return new Response($body, $status_code, $content_type, $cookies, $session);
+        $content_type = 'text/html; charset=UTF-8') {
+        return new Response($body, $status_code, $content_type);
     });
 
 // Security

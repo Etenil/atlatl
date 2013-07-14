@@ -47,6 +47,7 @@ class Core {
      */
     public function __construct($prefix = "", Server $server = null, Request $request = null, ModuleContainer $mc = null)
     {
+        session_start();
         if($server) {
             $this->server = $server;
         } else { // Backwards-compatibility
@@ -61,7 +62,7 @@ class Core {
         if($request) {
             $this->request = $request;
         } else { // Backwards-compatibility
-            $this->request = Injector::give('Request', $_GET, $_POST);
+            $this->request = Injector::give('Request', $_GET, $_POST, $_SESSION, $_COOKIE);
         }
 
         $this->register40x(function(\Exception $e) {
@@ -158,6 +159,7 @@ class Core {
 	 */
 	function serve(array $urls)
 	{
+        $_SESSION['toto'] = 'prout';
         $response = null;
 
         // Registering PHP error handlers.
@@ -192,6 +194,14 @@ class Core {
      * Processes the returned object from a handler.
      */
     protected function display($response) {
+        // TODO get rid of backwards compat here.
+        if($response->alteredSession()) {
+            $this->request->setAllSession($response->getAllSession());
+        }
+        if($response->alteredCookies()) {
+            $this->request->setAllCookies($response->getAllCookies());
+        }
+        $this->request->commitSessionAndCookies();
         if(is_object($response)) {
             $response->compile();
         } else {
