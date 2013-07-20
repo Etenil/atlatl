@@ -283,6 +283,12 @@ class Core {
 
         $response = null;
 
+        $this->modules->runMethod('preProcess', array(
+            'request' => $this->request,
+            'proto' => $proto,
+            'response' => $response,
+        ));
+
         if(!$class) { // Just a function call (or a closure?). Less hooks obviously.
             // Mounting system stuff into an object and generating the parameters.
             $params = array_merge(array((object)array(
@@ -325,6 +331,12 @@ class Core {
                         && !is_subclass_of($response, 'atlatl\Response')))) {
             throw new IllegalResponseException('Unknown response.');
         }
+
+        $this->modules->runMethod('postProcess', array(
+            'request' => $this->request,
+            'proto' => $proto,
+            'response' => $response
+        ));
 
         return $response;
     }
