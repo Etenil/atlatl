@@ -60,7 +60,7 @@ class ModuleContainer
 	 * the module's constructor. Default is none.
 	 */
     public function addModule($module, array $options = NULL) {
-		$this->add_to_list($module, new $module($this->server, $options));
+		$this->add_to_list($module, new $module($this->server, $this, $options));
     }
 
 	/**

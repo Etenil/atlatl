@@ -35,10 +35,11 @@ class Module
      * @param array $options is an associative array whose keys will
      * be mapped to properties for speed populating of the object.
 	 */
-	function __construct(Server $server, $options = NULL)
+	function __construct(Server $server, ModuleContainer $modules, $options = NULL)
 	{
         $this->server = $server;
         $this->options = $options;
+        $this->modules = $modules;
 
         $this->_init($options);
 	}
