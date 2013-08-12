@@ -316,11 +316,21 @@ class Response
 	 */
 	public function compile()
 	{
-        // Starting session first.
-        if(!is_array($this->sessionvars)) {
-            $this->sessionvars = array();
+        $session_started = false;
+        if(function_exists('session_status') && session_status() == PHP_SESSION_ACTIVE) {
+          $session_started = true;
         }
-        $_SESSION = @array_merge($_SESSION, $this->sessionvars);
+        else if(isset($_SESSION)) {
+          $session_started = true;
+        }
+
+        if($session_started) {
+          // Session handling.
+          if(!is_array($this->sessionvars)) {
+            $this->sessionvars = array();
+          }
+          $_SESSION = @array_merge($_SESSION, $this->sessionvars);
+        }
 
 		header('HTTP/1.1 ' . $this->httpStatus($this->getStatus()));
 		header('Content-Type: ' . $this->content_type);

@@ -41,7 +41,7 @@ class Request
 	 * @param array    $get        $_GET array.
 	 * @param array    $post       $_POST array.
 	 */
-	public function __construct(array $get, array $post, array $session, array $cookies)
+	public function __construct(array $get, array $post, $session, array $cookies)
 	{
 		$this->getvars = $get;
 		$this->postvars = $post;

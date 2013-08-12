@@ -47,7 +47,6 @@ class Core {
      */
     public function __construct($prefix = "", Server $server = null, Request $request = null, ModuleContainer $mc = null)
     {
-        session_start();
         if($server) {
             $this->server = $server;
         } else { // Backwards-compatibility
@@ -62,7 +61,7 @@ class Core {
         if($request) {
             $this->request = $request;
         } else { // Backwards-compatibility
-            $this->request = Injector::give('Request', $_GET, $_POST, $_SESSION, $_COOKIE);
+          $this->request = Injector::give('Request', $_GET, $_POST, (isset($_SESSION) ? $_SESSION : array()), $_COOKIE);
         }
 
         $this->register40x(function(\Exception $e) {
