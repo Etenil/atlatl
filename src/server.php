@@ -120,9 +120,14 @@ class Server
 		$this->admin       = $this->arrayGet('SERVER_ADMIN', $s);
 		$this->filename    = $this->arrayGet('SCRIPT_FILENAME', $s);
 		$this->scriptname  = $this->arrayGet('SCRIPT_NAME', $s);
-		$this->protocol    = $this->arrayGet('SERVER_PROTOCOL', $s);
 		$this->uri         = $this->arrayGet('REQUEST_URI', $s);
 		$this->time        = $this->arrayGet('REQUEST_TIME', $s);
+
+        if($this->arrayGet('HTTPS', $s) || strtolower($this->arrayGet('HTTP_X_FORWARDED_PROTO', $s)) == 'https') {
+            $this->protocol = 'https';
+        } else {
+            $this->protocol = 'http';
+        }
 
 		// Stripping GET and anchor from the URI.
 		$this->route = $this->uri;
@@ -198,8 +203,8 @@ class Server
 
     public function siteUrl($url)
     {
-        //$siteurl = $this->getProtocol() . '://' . $this->getHost();
-        $siteurl = 'http://' . $this->getHost();
+        $siteurl = $this->getProtocol() . '://' . $this->getHost();
+        //$siteurl = 'http://' . $this->getHost();
 
         if($this->getPort() != 80 && !strpos($this->getHost(), ':')) {
             $siteurl.= ':' . $this->getPort();
