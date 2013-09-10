@@ -315,7 +315,7 @@ class Request
         $_SESSION = $this->sessionvars;
 
         foreach($this->cookievars as $cookiename => $cookieval) {
-            setcookie($cookiename, $cookieval, time() + 3600 * 24 * 365.25);
+            setcookie($cookiename, $cookieval, time() + 3600 * 24 * 365.25, '/');
         }
 
         foreach($this->delcookie as $cookiename) {
