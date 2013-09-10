@@ -36,6 +36,9 @@ class Request
     /** Stores Cookie vars. */
     protected $cookievars;
 
+    protected $delsession;
+    protected $delcookie;
+
 	/**
 	 * Constructor, loads up GET and POST variables.
 	 * @param array    $get        $_GET array.
@@ -47,6 +50,9 @@ class Request
 		$this->postvars = $post;
         $this->sessionvars = $session;
         $this->cookievars = $cookies;
+
+        $this->delsession = array();
+        $this->delcookie = array();
 	}
 
 	/**
@@ -130,6 +136,9 @@ class Request
     public function getSession($varname, $default = false)
     {
         if(isset($this->sessionvars[$varname])) {
+            if(in_array($varname, $this->delsession)) {
+                unset($this->delsession[$varname]);
+            }
             return $this->sessionvars[$varname];
         } else {
             return $default;
@@ -143,6 +152,7 @@ class Request
     public function killSession($varname)
     {
         unset($this->sessionvars[$varname]);
+        $this->delsession[] = $varname;
         return $this;
     }
 
@@ -161,6 +171,7 @@ class Request
     public function killCookie($varname)
     {
         unset($this->cookievars[$varname]);
+        $this->delcookie[] = $varname;
         return $this;
     }
 
@@ -172,6 +183,10 @@ class Request
     public function setCookie($varname, $varval)
     {
         $this->cookievars[$varname] = $varval;
+        if(in_array($varname, $this->delcookie)) {
+            unset($this->delcookie[$varname]);
+        }
+        return $this->cookievars[$varname];
     }
 
     /**
@@ -298,7 +313,14 @@ class Request
 
     function commitSessionAndCookies() {
         $_SESSION = $this->sessionvars;
-        $_COOKIE = $this->cookievars;
+
+        foreach($this->cookievars as $cookiename => $cookieval) {
+            setcookie($cookiename, $cookieval, time() + 3600 * 24 * 365.25);
+        }
+
+        foreach($this->delcookie as $cookiename) {
+            setcookie($cookiename, false, time() - 3600);
+        }
     }
 }
 
